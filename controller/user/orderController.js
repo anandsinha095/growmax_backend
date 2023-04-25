@@ -26,10 +26,12 @@ const createOrder = async (req, res) => {
         return responseHandler(res, 400, "Bad request")
     }
     try {
+        console.log(">>>>>>>>>", req.body);
         let check_user_exist = await userModel.findOne({ _id: userId })
         if (!check_user_exist.emailVerified) {
             return responseHandler(res, 406, "Please verify your email Id")
         }
+        console.log(">>>>>>>check_user_exist>>", check_user_exist);
         if (!check_user_exist) return responseHandler(res, 406, "User doesn't exist")
         const packages = await packagesModel.findOne({ name: packageName });
         if (!packages) return responseHandler(res, 406, "Package doesn't exist")
@@ -37,9 +39,9 @@ const createOrder = async (req, res) => {
         req.body.dailyReward = (amount * packages.roi) / 100;
         req.body.userId = check_user_exist._id;
         var walletData =  await productModel.findOne({userId: check_user_exist._id}).sort({createdAt: -1});
-        const coreWallet = !wallet ? walletData.coreWallet :0;
-        const ecoWallet = !wallet ? walletData.ecoWallet: 0;
-        const tradeWallet = !wallet ? walletData.tradeWallet: 0;
+        const coreWallet = !walletData ? walletData.coreWallet :0;
+        const ecoWallet = !walletData ? walletData.ecoWallet: 0;
+        const tradeWallet = !walletData ? walletData.tradeWallet: 0;
         const data = { userId: check_user_exist._id, title: packageName, price: amount, roi: packages.roi, dailyReward: req.body.dailyReward, totalRewards: totalRewards, productStatus: "Active", coreWallet: coreWallet, ecoWallet: ecoWallet, tradeWallet: tradeWallet}
         await productModel.create(data) /* create purchased product object */
         await paymentHistoryModel.create(req.body) /* create payment history object */
