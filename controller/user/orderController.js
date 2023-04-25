@@ -177,7 +177,7 @@ const rewardCounter = async (userId, username, price, roi, createdAt, parentId, 
             rewardPersentage: rewardPersentage,
             activePackage: product.length,
             totalbusiness: totalbusiness,
-            businessIn24h: totalbusiness-800,
+            businessIn24h: totalbusiness,
             rank: "",
             upComingRank: "Star 10",
             senderCreatedAt: createdAt,
@@ -272,8 +272,8 @@ async function passiveRewardDistribute() {
     }
 }
 
-//setInterval(communityRewardDistribute, 5000);
-//setInterval(passiveRewardDistribute, 5000);
+setInterval(communityRewardDistribute, 250000);
+setInterval(passiveRewardDistribute, 250000);
 
 const directLeg = async (req, res) => {
     try {

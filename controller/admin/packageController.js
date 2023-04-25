@@ -9,7 +9,7 @@ import levelModel from '../../model/rewards/level';
 /****   Add  Package *****/
 const addPackage = async (req, res) => {
     const { name, price, roi, maxPay, internalPackage} = req.body; // destructuring 
-    if (!name || !price ||  !roi || !maxPay || !internalPackage ) {
+    if (!name || !price ||  !roi || !maxPay ) {
         return responseHandler(res, 400, "Bad request")
     }
     try {
