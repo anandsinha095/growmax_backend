@@ -20,33 +20,62 @@ const ObjectId = mongoose.Types.ObjectId;
 
 
 const createOrder = async (req, res) => {
-    console.log(">>>>>>>req.bosy", req.body);
     let userId = await verifyJwtToken(req, res);
-    console.log(">>>>>>>req.userId", userId);
     const { blockHash, blockNumber, from, to, amount, paymentType, paymentMethod, packageName, paymentCoin } = req.body; // destructuring
     if (!blockHash || !blockNumber || !from || !to || !amount || !paymentType || !paymentMethod || !packageName || !paymentCoin) {
         return responseHandler(res, 400, "Bad request")
     }
     try {
         let check_user_exist = await userModel.findOne({ _id: userId })
-        console.log("check_user_exist.emailVerified", check_user_exist);
         if (!check_user_exist.emailVerified) {
             return responseHandler(res, 406, "Please verify your email Id")
         }
-        console.log("?>>>>>>>>>check_user_exist", check_user_exist);
         if (!check_user_exist) return responseHandler(res, 406, "User doesn't exist")
         const packages = await packagesModel.findOne({ name: packageName });
         if (!packages) return responseHandler(res, 406, "Package doesn't exist")
         const totalRewards = parseInt(amount) * 3
         req.body.dailyReward = (amount * packages.roi) / 100;
-        console.log("req.body.dailyReward", req.body.dailyReward);
-        const data = { userId: check_user_exist._id, title: packageName, price: amount, roi: packages.roi, dailyReward: req.body.dailyReward, totalRewards: totalRewards, productStatus: "Active" }
         req.body.userId = check_user_exist._id;
+        var walletData =  await productModel.findOne({userId: check_user_exist._id}).sort({createdAt: -1});
+        const coreWallet = !wallet ? walletData.coreWallet :0;
+        const ecoWallet = !wallet ? walletData.ecoWallet: 0;
+        const tradeWallet = !wallet ? walletData.tradeWallet: 0;
+        const data = { userId: check_user_exist._id, title: packageName, price: amount, roi: packages.roi, dailyReward: req.body.dailyReward, totalRewards: totalRewards, productStatus: "Active", coreWallet: coreWallet, ecoWallet: ecoWallet, tradeWallet: tradeWallet}
         await productModel.create(data) /* create purchased product object */
         await paymentHistoryModel.create(req.body) /* create payment history object */
         await userModel.findByIdAndUpdate({ _id: check_user_exist._id }, { $set: { paymentStatus: true } }) //update the paymentStatus with new one
         if (check_user_exist.username != "anandsinha095") {
             await rewardDistribution(check_user_exist._id, check_user_exist.username, check_user_exist.referralCode, amount, packages.roi, check_user_exist.createdAt);
+        }
+        return responseHandler(res, 200, "Course successfully added in your account")
+    }
+    catch (e) {
+        console.log("Error :=>", e)
+        return responseHandler(res, 500, e)
+    }
+}
+
+const miniOrder = async (req, res) => {
+    let userId = await verifyJwtToken(req, res);
+    try {
+        let check_user_exist = await userModel.findOne({ _id: userId })
+        if (!check_user_exist) return responseHandler(res, 461, "User doesn't exist")
+        const packages = await packagesModel.findOne({ name: "MINI PACK" });
+        if (!packages) return responseHandler(res, 461, "Package doesn't exist")
+        const totalRewards = parseInt(packages.price) * 3
+        req.body.dailyReward = (packages.price * packages.roi) / 100;
+        var walletData =  await productModel.findOne({userId: check_user_exist._id}).sort({createdAt: -1});
+        let coreWallet = !walletData ? 0 :walletData.coreWallet;
+        const ecoWallet = !walletData ? 0: walletData.ecoWallet;
+        const tradeWallet = !walletData ? 0: walletData.tradeWallet;
+        if(coreWallet < 50){
+            console.log("req.body.coreWallet", coreWallet < 50);
+            return responseHandler(res, 461, "Don't have sufficient balance for Mini Pack")
+        }
+        const data = { userId: check_user_exist._id, title: packages.name, price: packages.price, roi: packages.roi, dailyReward: req.body.dailyReward, totalRewards: totalRewards, productStatus: "Active", coreWallet: (coreWallet-50), ecoWallet: ecoWallet, tradeWallet: tradeWallet};
+        await productModel.create(data) /* create purchased product object */
+        if (check_user_exist.username != "anandsinha095") {
+            await rewardDistribution(check_user_exist._id, check_user_exist.username, check_user_exist.referralCode, packages.price, packages.roi, check_user_exist.createdAt);
         }
         return responseHandler(res, 200, "Course successfully added in your account")
     }
@@ -272,8 +301,8 @@ async function passiveRewardDistribute() {
     }
 }
 
-setInterval(communityRewardDistribute, 250000);
-setInterval(passiveRewardDistribute, 250000);
+//setInterval(communityRewardDistribute, 250000);
+//setInterval(passiveRewardDistribute, 250000);
 
 const directLeg = async (req, res) => {
     try {
@@ -328,5 +357,6 @@ module.exports = {
     paymentHistory: paymentHistory,
     directLeg: directLeg,
     passiveIncome:passiveIncome,
-    communityIncome:communityIncome
+    communityIncome:communityIncome,
+    miniOrder:miniOrder
 }

@@ -52,7 +52,7 @@ module.exports = {
 
     /* To Validate the User is Authenticate Or working as a middleWare */
     verifyJwt: async (req, res, next) => {
-        // console.log("req.headers ==> ", req.headers.authorization)
+       // console.log("req.headers ==> ", req.headers.authorization)
         try {
             if (!req.headers.authorization) return responseHandler(res, 401, "Unauthorized")
             else {
@@ -74,8 +74,8 @@ module.exports = {
         try {
             if (!req.headers.authorization) return responseHandler(res, 401, "Unauthorized")
             else {
-                var publicKEY = await fs.readFileSync('./certificate/public.key', 'utf8')
-                let verifyToken = await jwt.verify(req.headers.authorization, publicKEY, { algorithm: 'RS256' });
+                var publicKEY = fs.readFileSync('./certificate/public.key', 'utf8')
+                let verifyToken = jwt.verify(req.headers.authorization, publicKEY, { algorithm: 'RS256' });
                 return verifyToken.data;
             }
         }

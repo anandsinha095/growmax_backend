@@ -9,13 +9,13 @@ import tokenModel from '../../model/commonModel/token';
 /* To verify the user Email */
 const check_Link_for_emailVerified = async (req, res) => {
     try {
-        const userObj =  await userModel.findOne({ _id: req.user.userId });
+        const userObj =  await userModel.findOne({ _id: req.user });
         if (userObj.emailVerified == true) return responseHandler(res, 406, "Email Id Already Verified.");
-        const data = await tokenModel.findOne({ userId: req.user.userId, type: 'EMAILV' });
+        const data = await tokenModel.findOne({ userId: req.user, type: 'EMAILV' });
 	    if (!data) return responseHandler(res, 404, "Invalid Token");
 	    if (data.otp != req.body.otp) return responseHandler(res, 404, "Invalid OTP");
         else {
-           const test = await userModel.findOneAndUpdate({ _id: req.user.userId }, {$set: {emailVerified: true} }, { new: true })
+           const test = await userModel.findOneAndUpdate({ _id: req.user }, {$set: {emailVerified: true} }, { new: true })
            return responseHandler(res, 200, "Congratulation ! Your email is successfully verified ! ")
         }
     }

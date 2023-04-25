@@ -34,8 +34,8 @@ const displayData = async (req, res) => {
         const businessIn24h = reward == null  ? 0 : reward.businessIn24h;
         const rank = reward == null  ? 0 : reward.rank;
         var walletData =  await productModel.findOne({userId:userId}).sort({createdAt: -1});
+        console.log(">>>>>>productModel", walletData);
         coreWallet = walletData.coreWallet
-        console.log("coreWallet", coreWallet);
         const ecoWallet =walletData.ecoWallet;
         const tradeWallet =  walletData.tradeWallet;
         let pendingReward = totalReward - (coreWallet + tradeWallet + ecoWallet);

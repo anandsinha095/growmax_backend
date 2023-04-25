@@ -1,6 +1,6 @@
 const orderRoute= require('express').Router();
-import {createOrder, getOrder, paymentHistory, directLeg, passiveIncome, communityIncome} from '../../controller/user/orderController';
-import {coreToEco, coreToTrade} from '../../controller/user/walletTransferController'
+import {createOrder, getOrder, paymentHistory, directLeg, passiveIncome, communityIncome, miniOrder} from '../../controller/user/orderController';
+import {coreToEco, coreToTrade, coreWalletBalance} from '../../controller/user/walletTransferController'
 import { verifyJwt, checkSession } from '../../common/function';
 
 /*********************************** Create New order *************************************************************************/
@@ -10,7 +10,10 @@ orderRoute.get('/paymentHistory',verifyJwt, paymentHistory);
 orderRoute.get('/directLeg',verifyJwt, directLeg);
 orderRoute.get('/passiveIncome',verifyJwt, passiveIncome);
 orderRoute.get('/communityIncome',verifyJwt, communityIncome);
+orderRoute.get('/coreWalletBalance',verifyJwt, coreWalletBalance);
 
 orderRoute.post('/coreToEco',verifyJwt, coreToEco);
 orderRoute.post('/coreToTrade',verifyJwt, coreToTrade);
+
+orderRoute.get('/miniOrder',verifyJwt, miniOrder);
 export default orderRoute;

@@ -1,5 +1,6 @@
 import { responseHandler } from '../../common/response';
 import { __esModule } from '@babel/register/lib/node';
+import userModel from '../../model/user/user';
 import productModel from '../../model/product/product'/* inventory */
 import { host, angular_port } from '../../envirnoment/config'
 import { sendMail, tenMinutesJwt, verifyEmail, bcrypt, bcryptVerify, verifyJwtToken } from '../../common/function';
@@ -14,8 +15,9 @@ const coreToEco = async (req, res) => {
        if(!req.body.amount){
         return responseHandler(res, 400, "Bad request");
        }
-        console.log("check_user_exist.emailVerified", check_user_exist);
-        let userId = await verifyJwtToken(req, res);
+       let userId = await verifyJwtToken(req, res);
+       let check_user_exist = await userModel.findOne({ _id: userId })
+       if (!check_user_exist) return responseHandler(res, 461, "User doesn't exist")
         const data = await productModel.findOne({ userId: userId}).sort({ createdAt: -1 });
         if(data.coreWallet < req.body.amount){
             return responseHandler(res, 406, "Don't have sufficient balance in core wallet");
@@ -39,8 +41,9 @@ const coreToTrade = async (req, res) => {
        if(!req.body.amount){
         return responseHandler(res, 400, "Bad request");
        }
-        console.log("check_user_exist.emailVerified", check_user_exist);
         let userId = await verifyJwtToken(req, res);
+        let check_user_exist = await userModel.findOne({ _id: userId })
+       if (!check_user_exist) return responseHandler(res, 461, "User doesn't exist")
         const data = await productModel.findOne({ userId: userId}).sort({ createdAt: -1 });
         if(data.coreWallet < req.body.amount){
             return responseHandler(res, 406, "Don't have sufficient balance in core wallet");
@@ -59,7 +62,25 @@ const coreToTrade = async (req, res) => {
     }
 }
 
+const coreWalletBalance = async (req, res) => {
+    try {
+       let userId = await verifyJwtToken(req, res);
+        const data = await productModel.findOne({ userId: userId}).sort({ createdAt: -1 });
+        if(!data){
+            return responseHandler(res, 200, {coreWalletBalance: 0});
+        }
+        return responseHandler(res, 200, "OK", {coreWalletBalance: data.coreWallet});
+    }
+    catch (e) {
+        console.log("Error :=>", e)
+        return responseHandler(res, 500, e)
+    }
+}
+
+
+
 module.exports = {
     coreToTrade: coreToTrade,
-    coreToEco: coreToEco
+    coreToEco: coreToEco,
+    coreWalletBalance: coreWalletBalance
 }
