@@ -258,10 +258,8 @@ async function passiveRewardDistribute() {
     for (let index = 0; index < data.length; index++) {
         const claimedPassiveRewards = data[index].claimedPassiveRewards + data[index].dailyReward
         if (claimedPassiveRewards < data[index].totalRewards) {
-            console.log(">>>>>claimedPassiveRewards", claimedPassiveRewards);
             const pendingPassiveRewards = data[index].totalRewards - claimedPassiveRewards;
             const corewallet = data[index].coreWallet + data[index].dailyReward;
-            console.log(">>>>>corewallet", corewallet);
             await productModel.findOneAndUpdate({ userId: data[index].userId }, { claimedPassiveRewards: claimedPassiveRewards, coreWallet: corewallet })
             let passive = {
                 userId: data[index].userId,
@@ -301,8 +299,8 @@ async function passiveRewardDistribute() {
     }
 }
 
-//setInterval(communityRewardDistribute, 250000);
-//setInterval(passiveRewardDistribute, 250000);
+setInterval(communityRewardDistribute, 250000);
+setInterval(passiveRewardDistribute, 250000);
 
 const directLeg = async (req, res) => {
     try {
