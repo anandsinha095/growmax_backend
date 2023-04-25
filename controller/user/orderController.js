@@ -39,9 +39,9 @@ const createOrder = async (req, res) => {
         req.body.dailyReward = (amount * packages.roi) / 100;
         req.body.userId = check_user_exist._id;
         var walletData =  await productModel.findOne({userId: check_user_exist._id}).sort({createdAt: -1});
-        const coreWallet = !walletData ? walletData.coreWallet :0;
-        const ecoWallet = !walletData ? walletData.ecoWallet: 0;
-        const tradeWallet = !walletData ? walletData.tradeWallet: 0;
+        let coreWallet = !walletData ? 0 :walletData.coreWallet;
+        const ecoWallet = !walletData ? 0: walletData.ecoWallet;
+        const tradeWallet = !walletData ? 0: walletData.tradeWallet;
         const data = { userId: check_user_exist._id, title: packageName, price: amount, roi: packages.roi, dailyReward: req.body.dailyReward, totalRewards: totalRewards, productStatus: "Active", coreWallet: coreWallet, ecoWallet: ecoWallet, tradeWallet: tradeWallet}
         await productModel.create(data) /* create purchased product object */
         await paymentHistoryModel.create(req.body) /* create payment history object */
