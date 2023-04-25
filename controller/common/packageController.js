@@ -6,10 +6,10 @@ var fs = require('fs');
   /****************************  fetching package  ************************/
 const packages = async (req, res) => {
     try{
-        const silver =  await packagesModel.find({ name: "SILVER"});
-        const gold =  await packagesModel.find({ name: "GOLD"})
-        const daimond =  await packagesModel.find({ name: "DIAMOND"})
-        const platinum =  await packagesModel.find({ name: "PLATINUM"})
+        const silver =  await packagesModel.find({ name: "Basic"});
+        const gold =  await packagesModel.find({ name: "Medium"})
+        const daimond =  await packagesModel.find({ name: "Advance"});
+        const platinum =  await packagesModel.find({ name: "Corporate"})
         return responseHandler(res, 200, "Packages Successfully fetched", {silver: silver, gold:gold, daimond:daimond, platinum:platinum})             
     }    
     catch (e) { return responseHandler(res, 500, "Internal Server Error.", e) }  
@@ -17,10 +17,10 @@ const packages = async (req, res) => {
 
   const reBuy = async (req, res) => {
     try{
-        const silver =  await packagesModel.find({ name: "SILVER"});
-        const gold =  await packagesModel.find({ name: "GOLD"})
-        const daimond =  await packagesModel.find({ name: "DIAMOND"})
-        const platinum =  await packagesModel.find({ name: "PLATINUM"})
+        const silver =  await packagesModel.find({ name: "Basic"});
+        const gold =  await packagesModel.find({ name: "Medium"})
+        const daimond =  await packagesModel.find({ name: "Advance"})
+        const platinum =  await packagesModel.find({ name: "Corporate"})
         const mini_pack =  await packagesModel.find({ name: "MINI PACK"})
         return responseHandler(res, 200, "Packages Successfully fetched", {silver: silver, gold:gold, daimond:daimond, platinum:platinum, mini_pack:mini_pack})             
     }    
