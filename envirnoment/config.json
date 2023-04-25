@@ -1,0 +1,13 @@
+{
+  "dev": {
+    "config_id": "dev",
+    "app_name": "Growmax",
+    "app_desc": "Growmax",
+    "json_indentation": 4,
+    "database": "mongodb://localhost:27017/GrowMaxx",
+    "fontend_host": "localhost:4200",
+    "host": "localhost:4200",
+    "nodeMailerEmail": "email.new.tester2014@gmail.com",
+    "nodeMailerPass": "maiplzlmrjfmhara"
+  }
+}
