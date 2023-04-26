@@ -232,7 +232,6 @@ async function communityRewardDistribute() {
         }
         const rewardPoint = data[index].rewardPoint - data[index].rewardPoint*20 /100
         const product = await productModel.find({ userId: data[index].userId, productStatus:"Active"}).sort({ createdAt: -1 });
-        console.log(">>>>>>>??????product.length", product.length);
         for (let i = 0; i < product.length; i++) {
             let comReward =  rewardPoint /  data[index].activePackage;
             let claimedCommunityRewards = product[i].claimedPassiveRewards +  comReward;
@@ -241,12 +240,13 @@ async function communityRewardDistribute() {
             await productModel.findOneAndUpdate({ _id: product[i]._id, userId: data[index].userId }, { claimedCommunityRewards: claimedCommunityRewards })
         }
         const pro = await productModel.findOne({ userId: data[index].userId, productStatus:"Active"}).sort({ createdAt: -1 });
-        console.log(">>>>>>>??????pro", pro);
-        let core = rewardPoint + pro.coreWallet;
-        let tradeWallet = pro.tradeWallet +  data[index].rewardPoint /10;
-        let ecoWallet =  pro.ecoWallet +  data[index].rewardPoint /10;
-        await productModel.findOneAndUpdate({ userId: data[index].userId }, {tradeWallet: tradeWallet, ecoWallet: ecoWallet, coreWallet: core }).sort({ createdAt: -1 });
-        await communityRewardModel.create(community);
+        if(pro){
+            let core = rewardPoint + pro.coreWallet;
+            let tradeWallet = pro.tradeWallet +  data[index].rewardPoint /10;
+            let ecoWallet =  pro.ecoWallet +  data[index].rewardPoint /10;
+            await productModel.findOneAndUpdate({ userId: data[index].userId }, {tradeWallet: tradeWallet, ecoWallet: ecoWallet, coreWallet: core }).sort({ createdAt: -1 });
+            await communityRewardModel.create(community);
+        }
     }
 }
 
