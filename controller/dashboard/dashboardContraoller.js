@@ -5,7 +5,9 @@ import productModel from '../../model/product/product'
 import userModel from '../../model/user/user'/* To Create user */
 import rewardsModel from '../../model/rewards/rewards';
 import communityRewardModel from '../../model/rewards/community';
+import passiveRewardModel from '../../model/rewards/passive';
 import paymetHistoryModel from '../../model/paymentHistory/paymentHistory'
+import passive from '../../model/rewards/passive';
 
 /***************************Display All dashboard page banner  *******************/
 const displayData = async (req, res) => {   
@@ -23,18 +25,25 @@ const displayData = async (req, res) => {
         let coreWallet =0;
         let communityReward=0;
         product.forEach(element => {
-            totalReward = totalReward + parseInt(element.totalRewards);
-            passiveReward = passiveReward + element.claimedPassiveRewards;
+            totalReward = totalReward + element.totalRewards;
+            //passiveReward = passiveReward + element.claimedPassiveRewards;
         }); 
         // eco and trade needs to add
-       
+        let passive  = 0;
+        var passiveIncome =  await passiveRewardModel.find({userId:userId});
+        passiveIncome.forEach(element => {
+            passiveReward = passiveReward + element.reward;
+            console.log(">>>>>>>>>passiveReward",passiveReward);
+        }); 
+       //console.log("passiveIncome",passive);
+        console.log("passiveReward", passiveReward)
+        
         const reward = await rewardsModel.findOne({ username: check_user_exist.username}).sort({createdAt: -1});
         const leg = reward == null  ? 0 : reward.directLeg;
         const totalbusiness = reward == null  ? 0 : reward.totalbusiness;
         const businessIn24h = reward == null  ? 0 : reward.businessIn24h;
         const rank = reward == null  ? 0 : reward.rank;
         var walletData =  await productModel.findOne({userId:userId}).sort({createdAt: -1});
-        console.log(">>>>>>productModel", walletData);
         coreWallet = walletData.coreWallet
         const ecoWallet =walletData.ecoWallet;
         const tradeWallet =  walletData.tradeWallet;

@@ -7,6 +7,7 @@ let product = Schema({
     dailyReward: { type: Number, trim: true, default:0},
     totalRewards: { type: Number, trim: true },
     claimedPassiveRewards:{type: Number, trim: true, default:0},
+    claimedCommunityRewards:{type: Number, trim: true, default:0},
     coreWallet:{type: Number, trim: true, default:0},
     ecoWallet:{type: Number, trim: true, default:0},
     tradeWallet:{type: Number, trim: true, default:0},
