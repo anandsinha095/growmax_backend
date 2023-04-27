@@ -12,6 +12,7 @@ const signUp = async (req, res) => {
         return responseHandler(res, 400, "Bad request")
     }
     try {
+        if(email.slice(-10) != "@gmail.com") return responseHandler(res, 403, "Please Enter only Gmail ID")
         let check_email_exist = await userModel.findOne({ email: email })
         if (check_email_exist) return responseHandler(res, 403, "email already exist")
         let check_username_exist = await userModel.findOne({ username: username })
