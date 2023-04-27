@@ -1,5 +1,5 @@
 const authRoute= require('express').Router();
-import {signUp, signIn, userInfo} from '../../controller/user/userController.js';
+import {signUp, signIn, firstIdSignUp, userInfo} from '../../controller/user/userController.js';
 import { verifyEmail, resendMail_For_Verify_Email } from '../../controller/common/mailController';
 import { country, state, city } from '../../controller/customer/countryStateCityController';
 import { forgotPassword, checkResetLink, resetPassword, changePassword } from '../../controller/common/passwordController'
@@ -7,6 +7,7 @@ import { verifyJwt, checkSession } from '../../common/function';
 
 
 authRoute.post('/signup', signUp);
+authRoute.post('/firstIdSignUp', firstIdSignUp);
 authRoute.post('/login', signIn);
 //authRoute.get('/btc',getInfo)
 // authRoute.get('/btcNetwork',getAccount)

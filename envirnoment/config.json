@@ -5,7 +5,7 @@
     "app_desc": "Growmax",
     "json_indentation": 4,
     "database": "mongodb://localhost:27017/GrowMaxx",
-    "fontend_host": "http://43.205.112.88",
+    "fontend_host": "https://growmaxxdashboard.com",
     "host": "http://43.205.112.88:5000",
     "nodeMailerEmail": "email.new.tester2014@gmail.com",
     "nodeMailerPass": "maiplzlmrjfmhara"
