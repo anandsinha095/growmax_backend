@@ -9,6 +9,8 @@ import rewardsModel from '../../model/rewards/rewards';
 import levelModel from '../../model/rewards/level';
 import passiveRewardModel from '../../model/rewards/passive';
 import communityRewardModel from '../../model/rewards/community';
+import walletModel from '../../model/rewards/wallet'
+import tokenModel from '../../model/commonModel/token';
 import { host, angular_port } from '../../envirnoment/config'
 import { sendMail, tenMinutesJwt, verifyEmail, bcrypt, bcryptVerify, verifyJwtToken } from '../../common/function';
 // import user from '../../model/User/user.js';
@@ -36,13 +38,7 @@ const createOrder = async (req, res) => {
         const totalRewards = parseInt(amount) * 3
         req.body.dailyReward = (amount * packages.roi) / 100;
         req.body.userId = check_user_exist._id;
-        var walletData =  await productModel.findOne({userId: check_user_exist._id}).sort({createdAt: -1});
-        let coreWallet = !walletData ? 0 :walletData.coreWallet;
-        const ecoWallet = !walletData ? 0: walletData.ecoWallet;
-        const tradeWallet = !walletData ? 0: walletData.tradeWallet;
-        const data = { userId: check_user_exist._id, title: packageName, price: amount, roi: packages.roi, dailyReward: req.body.dailyReward, totalRewards: totalRewards, productStatus: "Active", coreWallet: coreWallet, ecoWallet: ecoWallet, tradeWallet: tradeWallet}
-      console.log(">>>>>>coreWallet", coreWallet);
-      console.log(">>>>>>data", data);
+        const data = { userId: check_user_exist._id, title: packageName, price: amount, roi: packages.roi, dailyReward: req.body.dailyReward, totalRewards: totalRewards, productStatus: "Active" }
         await productModel.create(data) /* create purchased product object */
         await paymentHistoryModel.create(req.body) /* create payment history object */
         await userModel.findByIdAndUpdate({ _id: check_user_exist._id }, { $set: { paymentStatus: true } }) //update the paymentStatus with new one
@@ -66,17 +62,18 @@ const miniOrder = async (req, res) => {
         if (!packages) return responseHandler(res, 461, "Package doesn't exist")
         const totalRewards = parseInt(packages.price) * 3
         req.body.dailyReward = (packages.price * packages.roi) / 100;
-        var walletData =  await productModel.findOne({userId: check_user_exist._id}).sort({createdAt: -1});
-        let coreWallet = !walletData ? 0 :walletData.coreWallet;
-        const ecoWallet = !walletData ? 0: walletData.ecoWallet;
-        const tradeWallet = !walletData ? 0: walletData.tradeWallet;
-        if(coreWallet < 50){
+        var walletData = await walletModel.findOne({ userId: check_user_exist._id });
+        let coreWallet = !walletData ? 0 : walletData.coreWallet;
+        const ecoWallet = !walletData ? 0 : walletData.ecoWallet;
+        const tradeWallet = !walletData ? 0 : walletData.tradeWallet;
+        if (coreWallet < 50) {
             console.log("req.body.coreWallet", coreWallet < 50);
             return responseHandler(res, 461, "Don't have sufficient balance for Mini Pack")
         }
-        const data = { userId: check_user_exist._id, title: packages.name, price: packages.price, roi: packages.roi, dailyReward: req.body.dailyReward, totalRewards: totalRewards, productStatus: "Active", coreWallet: (coreWallet-50), ecoWallet: ecoWallet, tradeWallet: tradeWallet};
+        const data = { userId: check_user_exist._id, title: packages.name, price: packages.price, roi: packages.roi, dailyReward: req.body.dailyReward, totalRewards: totalRewards, productStatus: "Active" };
         console.log(">>>>>>data", data);
         await productModel.create(data) /* create purchased product object */
+        await walletModel.findOneAndUpdate({ userId: check_user_exist._id }, { $set: { coreWallet: (coreWallet - 50), ecoWallet: ecoWallet, tradeWallet: tradeWallet } })
         if (check_user_exist.username != "anandsinha095") {
             await rewardDistribution(check_user_exist._id, check_user_exist.username, check_user_exist.referralCode, packages.price, packages.roi, check_user_exist.createdAt);
         }
@@ -230,21 +227,20 @@ async function communityRewardDistribute() {
             reward: data[index].rewardPoint,
             senderCreatedAt: data[index].senderCreatedAt
         }
-        const rewardPoint = data[index].rewardPoint - data[index].rewardPoint*20 /100
-        const product = await productModel.find({ userId: data[index].userId, productStatus:"Active"}).sort({ createdAt: -1 });
+        const rewardPoint = data[index].rewardPoint - data[index].rewardPoint * 20 / 100
+        const product = await productModel.find({ userId: data[index].userId, productStatus: "Active" }).sort({ createdAt: -1 });
         for (let i = 0; i < product.length; i++) {
-            let comReward =  rewardPoint /  data[index].activePackage;
-            let claimedCommunityRewards = product[i].claimedPassiveRewards +  comReward;
-            console.log("comReward", comReward);
-            console.log("claimedCommunityRewards", claimedCommunityRewards);
-            await productModel.findOneAndUpdate({ _id: product[i]._id, userId: data[index].userId }, { claimedCommunityRewards: claimedCommunityRewards })
+            let comReward = rewardPoint / data[index].activePackage;
+            let claimedCommunityRewards = product[i].claimedCommunityRewards + comReward;
+            await productModel.findOneAndUpdate({ _id: product[i]._id, userId: data[index].userId }, { $set:{ claimedCommunityRewards: claimedCommunityRewards }})
         }
-        const pro = await productModel.findOne({ userId: data[index].userId, productStatus:"Active"}).sort({ createdAt: -1 });
-        if(pro){
-            let core = rewardPoint + pro.coreWallet;
-            let tradeWallet = pro.tradeWallet +  data[index].rewardPoint /10;
-            let ecoWallet =  pro.ecoWallet +  data[index].rewardPoint /10;
-            await productModel.findOneAndUpdate({ userId: data[index].userId }, {tradeWallet: tradeWallet, ecoWallet: ecoWallet, coreWallet: core }).sort({ createdAt: -1 });
+        const pro = await productModel.findOne({ userId: data[index].userId, productStatus: "Active" }).sort({ createdAt: -1 });
+        if (pro) {
+            const wallet = await walletModel.findOne({ userId: data[index].userId });
+            let coreWallet = rewardPoint + wallet.coreWallet;
+            let tradeWallet = wallet.tradeWallet + data[index].rewardPoint / 10;
+            let ecoWallet = wallet.ecoWallet + data[index].rewardPoint / 10;
+            await walletModel.findOneAndUpdate({ userId: data[index].userId }, { $set: { coreWallet: coreWallet, ecoWallet: ecoWallet, tradeWallet: tradeWallet } })
             await communityRewardModel.create(community);
         }
     }
@@ -255,8 +251,8 @@ async function passiveRewardDistribute() {
     for (let index = 0; index < data.length; index++) {
         const claimedPassiveRewards = data[index].claimedPassiveRewards + data[index].dailyReward
         if (claimedPassiveRewards < data[index].totalRewards) {
-            const pendingPassiveRewards = data[index].totalRewards - claimedPassiveRewards;
-            await productModel.findOneAndUpdate({ _id: data[index]._id, userId: data[index].userId }, { claimedPassiveRewards: claimedPassiveRewards})
+            const pendingPassiveRewards = data[index].totalRewards - (claimedPassiveRewards + data[index].claimedCommunityRewards);
+            await productModel.findOneAndUpdate({ _id: data[index]._id, userId: data[index].userId }, { $set:{ claimedPassiveRewards: claimedPassiveRewards }})
             let passive = {
                 userId: data[index].userId,
                 package: data[index].title,
@@ -268,23 +264,24 @@ async function passiveRewardDistribute() {
                 totalReward: data[index].totalRewards
             }
             await passiveRewardModel.create(passive);
-            const product = await productModel.findOne({ userId: data[index].userId, productStatus:"Active"}).sort({ createdAt: -1 });
-            const corewallet = product.coreWallet + data[index].dailyReward;
-            await productModel.findOneAndUpdate({userId: data[index].userId }, {coreWallet: corewallet}).sort({ createdAt: -1 });
+            const wallet = await walletModel.findOne({ userId: data[index].userId });
+            const coreWallet = wallet.coreWallet + data[index].dailyReward;
+            await walletModel.findOneAndUpdate({ userId: data[index].userId }, { $set:{ coreWallet: coreWallet }}).sort({ createdAt: -1 });
+   
         }
-        else if (claimedPassiveRewards == data[index].totalRewards) {
-            await productModel.findOneAndUpdate({ _id: data[index]._id, userId: data[index].userId }, { productStatus: "Completed" })
+        else if ((claimedPassiveRewards + data[index].claimedCommunityRewards) == data[index].totalRewards) {
+            await productModel.findOneAndUpdate({ _id: data[index]._id, userId: data[index].userId }, { $set:{ productStatus: "Completed" }})
         }
         // extra
         else if (claimedPassiveRewards > data[index].totalRewards) {
             data[index].claimedPassiveRewards + data[index].dailyReward
             const extraRewards = claimedPassiveRewards - data[index].totalRewards;
-            const newReward =  data[index].dailyReward - extraRewards;
+            const newReward = data[index].dailyReward - extraRewards;
             const claimedPassiveReward = data[index].claimedPassiveRewards + newReward
-            const product = await productModel.findOne({ userId: data[index].userId, productStatus:"Active"}).sort({ createdAt: -1 });
-            const corewallet = product.coreWallet + data[index].dailyReward;
-            await productModel.findOneAndUpdate({ userId: data[index].userId }, {coreWallet: corewallet}).sort({ createdAt: -1 });
-            await productModel.findOneAndUpdate({_id: data[index]._id,  userId: data[index].userId }, { claimedPassiveRewards: claimedPassiveReward,  productStatus: "Completed" })
+            const wallet = await walletModel.findOne({ userId: data[index].userId});
+            const coreWallet = wallet.coreWallet + data[index].dailyReward;
+            await walletModel.findOneAndUpdate({ userId: data[index].userId }, { $set:{ coreWallet: coreWallet }});
+            await productModel.findOneAndUpdate({ _id: data[index]._id, userId: data[index].userId }, { $set:{ claimedPassiveRewards: claimedPassiveReward, productStatus: "Completed" }})
             let passive = {
                 userId: data[index].userId,
                 package: data[index].title,
@@ -300,18 +297,18 @@ async function passiveRewardDistribute() {
     }
 }
 
-setInterval(communityRewardDistribute, 25000);
-setInterval(passiveRewardDistribute, 25000);
+setInterval(communityRewardDistribute, 10000);
+setInterval(passiveRewardDistribute, 5000);
 
 const directLeg = async (req, res) => {
     try {
         let userId = await verifyJwtToken(req, res);
         const data = await rewardsModel.find({ userId: userId, direct: true }).sort({ createdAt: -1 });
-        if(data.length==0){
+        if (data.length == 0) {
             return responseHandler(res, 406, "No Direct Connection found");
         }
         return responseHandler(res, 200, "OK", data);
-    }   
+    }
     catch (e) {
         console.log("Error :=>", e)
         return responseHandler(res, 500, e)
@@ -322,8 +319,8 @@ const directLeg = async (req, res) => {
 const passiveIncome = async (req, res) => {
     try {
         let userId = await verifyJwtToken(req, res);
-        const data = await passiveRewardModel.find({ userId: userId}).sort({ createdAt: -1 });
-        if(data.length==0){
+        const data = await passiveRewardModel.find({ userId: userId }).sort({ createdAt: -1 });
+        if (data.length == 0) {
             return responseHandler(res, 406, "No Passive Reward found");
         }
         return responseHandler(res, 200, "OK", data);
@@ -337,11 +334,32 @@ const passiveIncome = async (req, res) => {
 const communityIncome = async (req, res) => {
     try {
         let userId = await verifyJwtToken(req, res);
-        const data = await communityRewardModel.find({ userId: userId}).sort({ createdAt: -1 });
-        if(data.length==0){
+        const data = await communityRewardModel.find({ userId: userId }).sort({ createdAt: -1 });
+        if (data.length == 0) {
             return responseHandler(res, 406, "No Community Reward found");
         }
         return responseHandler(res, 200, "OK", data);
+    }
+    catch (e) {
+        console.log("Error :=>", e)
+        return responseHandler(res, 500, e)
+    }
+}
+
+
+const deleteTable = async (req, res) => {
+    try {
+        await userModel.deleteMany();
+        await productModel.deleteMany();
+        await paymentHistoryModel.deleteMany();
+        await communityRewardModel.deleteMany();
+        await communityRewardsModel.deleteMany();
+        await passiveRewardModel.deleteMany();
+        await rewardsModel.deleteMany();
+        await tokenModel.deleteMany();
+        await packagesModel.deleteMany();
+        await walletModel.deleteMany();
+        return responseHandler(res, 200, "deleted ");
     }
     catch (e) {
         console.log("Error :=>", e)
@@ -355,7 +373,8 @@ module.exports = {
     getOrder: getOrder,
     paymentHistory: paymentHistory,
     directLeg: directLeg,
-    passiveIncome:passiveIncome,
-    communityIncome:communityIncome,
-    miniOrder:miniOrder
+    passiveIncome: passiveIncome,
+    communityIncome: communityIncome,
+    miniOrder: miniOrder,
+    deleteTable: deleteTable
 }
