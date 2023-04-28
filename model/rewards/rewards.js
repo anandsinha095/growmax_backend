@@ -12,6 +12,7 @@ let rewards = Schema({
     activePackage:{type: Number, trim: true},
     totalbusiness:{type: Number, trim: true},
     businessIn24h:{type: Number, trim: true},
+    requiredLevel:{type: Number, trim: true},
     rank: { type: String, default: true },
     upComingRank: { type: String, default: true },
     senderCreatedAt:{type: Date},

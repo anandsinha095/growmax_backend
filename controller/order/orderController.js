@@ -158,27 +158,33 @@ const rewardCounter = async (userId, username, price, roi, createdAt, parentId, 
         let rewardPersentage;
         let totalbusiness;
         let direct = false;
+        let isActive = false;
+        let requiredLevel;
         if (index + 1 == 1) {
-            const legVerify = await rewardsModel.findOne({ username: parentUsername, senderId: userId });
-            directLeg = !parentReward ? 1 : (!legVerify ? (parentReward.directLeg + 1) : parentReward.directLeg);
+            const legVerify = await rewardsModel.findOne({ username: parentUsername , senderId: userId});
+            directLeg = !parentReward ? 1 :(!legVerify ? parentReward.directLeg + 1 : parentReward.directLeg);
             rewardPoint = ((price * roi) / 100) * (20 / 100);
-            level = await levelModel.findOne({ direct: directLeg });
+            level = await levelModel.findOne({ direct: directLeg});
             totalbusiness = price;
             rewardPersentage = 20;
             direct = true;
+            isActive = true; 
+            requiredLevel = 1;
+            if(parentReward){
+                await rewardsModel.updateMany({ username: parentUsername}, { $set: { directLeg: directLeg, level:level.level}});
+            }
         }
         else {
             level = await levelModel.findOne({ direct: parentReward.directLeg });
+            let levels = await levelModel.findOne({ level: index + 1 });
+            rewardPoint = ((price * roi) / 100) * (levels.rewardPersentage / 100);
+            rewardPersentage = levels.rewardPersentage
             if (level.direct >= index + 1) {
-                let levels = await levelModel.findOne({ level: index + 1 });
-                rewardPoint = ((price * roi) / 100) * (levels.rewardPersentage / 100);
-                rewardPersentage = levels.rewardPersentage
-            }
-            else {
-                return;
+                isActive = true;  
             }
             directLeg = parentReward.directLeg;
             totalbusiness = parentReward.totalbusiness + price;
+            requiredLevel = index + 1
         }
         const data = {
             userId: parentId,
@@ -193,11 +199,12 @@ const rewardCounter = async (userId, username, price, roi, createdAt, parentId, 
             activePackage: product.length,
             totalbusiness: totalbusiness,
             businessIn24h: totalbusiness,
+            requiredLevel: requiredLevel,
             rank: "",
             upComingRank: "Star 10",
             senderCreatedAt: createdAt,
             status: true,
-            isActive: true
+            isActive: isActive
         }
         await rewardsModel.create(data);
     }
@@ -206,19 +213,18 @@ const rewardCounter = async (userId, username, price, roi, createdAt, parentId, 
         return responseHandler(res, 500, e)
     }
 }
+async function updateRewardNLeg(){
+    const data = await rewardsModel.find({isActive: false});
+    for (let index = 0; index < data.length; index++) {
+       if(data[index].level >= data[index].requiredLevel){
+         await rewardsModel.findOneAndUpdate({ _id: data[index]._id}, { $set: {isActive: true}});
+       }
+    }
+}
 
 async function communityRewardDistribute() {
-    const data = await rewardsModel.find();
+    const data = await rewardsModel.find({isActive: true});
     for (let index = 0; index < data.length; index++) {
-        let community = {
-            userId: data[index].userId,
-            username: data[index].username,
-            senderId: data[index].senderId,
-            senderUsername: data[index].senderUsername,
-            roi: data[index].roi,
-            reward: data[index].rewardPoint,
-            senderCreatedAt: data[index].senderCreatedAt
-        }
         const rewardPoint = data[index].rewardPoint - (data[index].rewardPoint * 20 / 100)
         const product = await productModel.find({ userId: data[index].userId, productStatus: "Active" });
         for (let i = 0; i < product.length; i++) {
@@ -243,9 +249,6 @@ async function communityRewardDistribute() {
                 await walletModel.findOneAndUpdate({ userId: data[index].userId }, { $set: { coreWallet: coreWallet } });
                 await productModel.findOneAndUpdate({ _id: data[index]._id, userId: data[index].userId }, { $set: { claimedCommunityRewards: claimedCommunityRewards, productStatus: "Completed", pendingReward: pendingRewards, extraRewards:extraRewards } })
             }
-            else {
-                return
-            }
         }
         const pro = await productModel.findOne({ userId: data[index].userId, productStatus: "Active" }).sort({ createdAt: -1 });
         if (pro) {
@@ -260,6 +263,15 @@ async function communityRewardDistribute() {
             }); 
             if((coreWallet+ecoWallet+tradeWallet) <= totalRewards ){
                 await walletModel.findOneAndUpdate({ userId: data[index].userId }, { $set: { coreWallet: coreWallet, ecoWallet: ecoWallet, tradeWallet: tradeWallet } })
+            }
+            let community = {
+                userId: data[index].userId,
+                username: data[index].username,
+                senderId: data[index].senderId,
+                senderUsername: data[index].senderUsername,
+                roi: data[index].roi,
+                reward: data[index].rewardPoint,
+                senderCreatedAt: data[index].senderCreatedAt
             }
             await communityRewardModel.create(community);
         }
@@ -342,6 +354,7 @@ async function passiveRewardDistribute() {
 
 setInterval(communityRewardDistribute, 15000);
 setInterval(passiveRewardDistribute, 5000);
+setInterval(updateRewardNLeg, 5000);
 
 const directLeg = async (req, res) => {
     try {

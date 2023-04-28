@@ -38,8 +38,8 @@ const displayData = async (req, res) => {
         // passiveIncome.forEach(element => {
         //     passiveReward = passiveReward + element.reward;
         // }); 
-       //console.log("passiveIncome",passive);
-       // console.log("passiveReward", passiveReward)
+    //    console.log("passiveIncome",passive);
+    //    console.log("passiveReward", passiveReward)
         
         const reward = await rewardsModel.findOne({ username: check_user_exist.username}).sort({createdAt: -1});
         const leg = reward == null  ? 0 : reward.directLeg;
@@ -51,7 +51,8 @@ const displayData = async (req, res) => {
         var communityIncome =  await communityRewardModel.find({userId:userId})
         communityIncome.forEach(element => {
             communityReward = communityReward + element.reward;
-            }); 
+            });
+            console.log("communityReward",communityReward); 
         return responseHandler(res, 200, "Success", {totalCourse: courses, totalReward: totalReward, pendingReward: pending, passiveReward: passiveReward, coreWallet: walletData.coreWallet, leg: leg, totalbusiness: totalbusiness, businessIn24h: businessIn24h, ecoWallet: walletData.ecoWallet, tradeWallet: walletData.tradeWallet,  communityReward: communityReward})       
     }
     catch (e) { return responseHandler(res, 500, "Internal Server Error.", e) }
