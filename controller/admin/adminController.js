@@ -4,7 +4,6 @@ import { __esModule } from '@babel/register/lib/node';
 import { responseHandler } from '../../common/response'
 import { bcrypt, bcryptVerify, createJwt, sendMail, verifyJwtToken} from '../../common/function';
 import tokenModel from '../../model/commonModel/token';
-import permissionModel from '../../model/admin/permission'
 import multiparty from 'multiparty';
 import csc from 'country-state-city'
 import { host, angular_port } from '../../envirnoment/config';

@@ -2,13 +2,10 @@ import express from 'express';
 import mongoose from "mongoose"
 import { mongo_url } from './envirnoment/config'
 import authRoute from './router/userRouter/userRouter.js'
-import classesRoute from './router/classRouter/classRouter.js'
-import studentRoute from './router/studentRouter/studentRouter.js'
 import orderRoute from './router/orderRouter/orderRouter.js'
 import adminRoute from './router/adminRouter/adminRouter.js'
 import publicRoute from './router/common/publicRouter'
 import dashboardRoute from './router/userRouter/dashboardRoute'
-import customerRoute from './router/customer/customerRouter'
 import { json, urlencoded } from 'body-parser';
 /* import cors for outside request(Resolve the cross origin issue) */
 import cors from 'cors';
@@ -41,11 +38,8 @@ app.use(function(req,res,next){
 });
 
 app.use('/api/v1/user', authRoute)
-app.use('/api/v1/classes', classesRoute)
-app.use('/api/v1/student', studentRoute)
 app.use('/api/v1/order', orderRoute)
 app.use('/api/v1/admin', adminRoute)
-app.use('/api/v1/customer', customerRoute)
 app.use('/api/v1/public', publicRoute)
 app.use('/api/v1/dashboard', dashboardRoute)
 mongoose.set('useNewUrlParser', true);

@@ -1,5 +1,3 @@
-import vendorModel from '../../model/vendor/vendor'/* To Create user */
-import customerModel from '../../model/customer/customer';
 import userModel from '../../model/user/user.js';
 import { responseHandler } from '../../common/response';
 import tokenModel from '../../model/commonModel/token'

@@ -83,10 +83,26 @@ const updateRole = async (req, res) => {
     catch (e) { return responseHandler(res, 500, "Internal Server Error.", e) }
 }
 
+/****   Update  role *****/
+const updatePackage = async (req, res) => {
+    const { name, price, roi, maxPay, internalPackage, packagesId} = req.body; // destructuring 
+    if (!name || !price ||  !roi || !maxPay || !packagesId) {
+        return responseHandler(res, 400, "Bad request")
+    }
+    try {
+        // let check_role_exist = await roleModel.find({roleName: roleName , _id: { $ne: roleId }})
+        // if (check_role_exist) return responseHandler(res, 403, "Role already exist")
+        let roleData = await roleModel.updateOne({ _id: packagesId },{ $set: {name:name , price: price , roi: roi , maxPay: maxPay } } );
+        return responseHandler(res, 200, "Role updated successfully.")
+    }
+    catch (e) { return responseHandler(res, 500, "Internal Server Error.", e) }
+}
+
 module.exports = {
     addPackage: addPackage,
     addLevel:addLevel,
     roleList: roleList,
     roleDetail:roleDetail,
-    updateRole:updateRole
+    updateRole:updateRole,
+    updatePackage:updatePackage
 };

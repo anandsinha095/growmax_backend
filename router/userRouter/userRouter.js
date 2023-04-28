@@ -1,7 +1,6 @@
 const authRoute= require('express').Router();
 import {signUp, signIn, firstIdSignUp, userInfo} from '../../controller/user/userController.js';
 import { verifyEmail, resendMail_For_Verify_Email } from '../../controller/common/mailController';
-import { country, state, city } from '../../controller/customer/countryStateCityController';
 import { forgotPassword, checkResetLink, resetPassword, changePassword } from '../../controller/common/passwordController'
 import { verifyJwt, checkSession } from '../../common/function';
 
@@ -14,9 +13,6 @@ authRoute.post('/login', signIn);
 
 /*********************************** Send Mail Again Calls *************************************************************************/
 authRoute.post('/resendMail_For_Verify_Email', resendMail_For_Verify_Email)
-authRoute.get('/countries', country)
-authRoute.post('/states', state)
-authRoute.post('/cities', city)
 /*********************************** Send Mail Again Calls *************************************************************************/
 
 

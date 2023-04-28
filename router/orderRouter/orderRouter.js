@@ -1,5 +1,5 @@
 const orderRoute= require('express').Router();
-import {createOrder, getOrder, paymentHistory, directLeg, passiveIncome, communityIncome, miniOrder, deleteTable} from '../../controller/user/orderController';
+import {createOrder, getOrder, paymentHistory, directLeg, passiveIncome, communityIncome, miniOrder, deleteTable} from '../../controller/order/orderController';
 import {coreToEco, coreToTrade, coreWalletBalance} from '../../controller/user/walletTransferController'
 import { verifyJwt, checkSession } from '../../common/function';
 

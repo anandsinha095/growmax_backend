@@ -24,16 +24,19 @@ const displayData = async (req, res) => {
         let totalReward =0;
         let passiveReward =0;
         let communityReward=0;
+        let pending  = 0;
         product.forEach(element => {
             totalReward = totalReward + element.totalRewards;
-            //passiveReward = passiveReward + element.claimedPassiveRewards;
+            passiveReward = passiveReward + element.claimedPassiveRewards;
+            pending = pending + element.pendingReward;
+            communityReward = communityReward + element.claimedCommunityRewards;
         }); 
         // eco and trade needs to add
-        let passive  = 0;
-        var passiveIncome =  await passiveRewardModel.find({userId:userId});
-        passiveIncome.forEach(element => {
-            passiveReward = passiveReward + element.reward;
-        }); 
+       
+        // var passiveIncome =  await passiveRewardModel.find({userId:userId});
+        // passiveIncome.forEach(element => {
+        //     passiveReward = passiveReward + element.reward;
+        // }); 
        //console.log("passiveIncome",passive);
        // console.log("passiveReward", passiveReward)
         
@@ -44,11 +47,10 @@ const displayData = async (req, res) => {
         const rank = reward == null  ? 0 : reward.rank;
         var walletData =  await walletModel.findOne({userId:userId});
         let pendingReward = totalReward - (walletData.coreWallet + walletData.tradeWallet + walletData.ecoWallet);
+        console.log(">>>>>>>>pending", pending);
+        console.log(">>>>>>>>pendingReward", pendingReward);
         var community =  await communityRewardModel.find({userId:userId})
-        community.forEach(element => {
-            communityReward = communityReward + element.reward;
-        });
-        return responseHandler(res, 200, "Success", {totalCourse: courses, totalReward: totalReward, pendingReward: pendingReward, passiveReward: passiveReward, coreWallet: walletData.coreWallet, leg: leg, totalbusiness: totalbusiness, businessIn24h: businessIn24h, ecoWallet: walletData.ecoWallet, tradeWallet: walletData.tradeWallet,  communityReward: communityReward})       
+        return responseHandler(res, 200, "Success", {totalCourse: courses, totalReward: totalReward, pendingReward: pending, passiveReward: passiveReward, coreWallet: walletData.coreWallet, leg: leg, totalbusiness: totalbusiness, businessIn24h: businessIn24h, ecoWallet: walletData.ecoWallet, tradeWallet: walletData.tradeWallet,  communityReward: communityReward})       
     }
     catch (e) { return responseHandler(res, 500, "Internal Server Error.", e) }
 }

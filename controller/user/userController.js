@@ -17,7 +17,7 @@ const signUp = async (req, res) => {
         if (check_email_exist) return responseHandler(res, 403, "email already exist")
         let check_username_exist = await userModel.findOne({ username: username })
         if (check_username_exist) return responseHandler(res, 403, "Username already exist")
-        let check_referral_exist = await userModel.findOne({ referralCode: referralCode })
+        let check_referral_exist = await userModel.findOne({ username: referralCode })
         if (!check_referral_exist) return responseHandler(res, 403, "Referral ID doesn't exist")
          /* 1: Admin // 2: Employee // 3:Customer //4: production head*/
         req.body.password =await bcrypt(password) 

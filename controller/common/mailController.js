@@ -1,7 +1,5 @@
 import { responseHandler } from '../../common/response';
 import { verifyEmail, createJwt, sendMail } from '../../common/function'
-import customerModel from '../../model/customer/customer';
-import vendorModel from '../../model/vendor/vendor';
 import userModel from '../../model/user/user';
 import tokenModel from '../../model/commonModel/token';
 // import user from '../../model/User/user.js';
