@@ -72,7 +72,7 @@ const miniOrder = async (req, res) => {
         const data = { userId: check_user_exist._id, title: packages.name, price: packages.price, roi: packages.roi, dailyReward: req.body.dailyReward, totalRewards: totalRewards, productStatus: "Active", pendingReward: totalRewards};
         await productModel.create(data) /* create purchased product object */
         await walletModel.findOneAndUpdate({ userId: check_user_exist._id }, { $set: { coreWallet: (coreWallet - 50), ecoWallet: ecoWallet, tradeWallet: tradeWallet } })
-        if (check_user_exist.username != "anandsinha095") {
+        if (check_user_exist.username != "Growmaxx") {
             await rewardDistribution(check_user_exist._id, check_user_exist.username, check_user_exist.referralCode, packages.price, packages.roi, check_user_exist.createdAt);
         }
         return responseHandler(res, 200, "Course successfully added in your account")
@@ -258,14 +258,14 @@ async function communityRewardDistribute() {
                 const pendingRewards = product[i].pendingReward - newReward;
                 const wallet = await walletModel.findOne({ userId: data[index].userId });
                 let coreWallet = newReward - (newReward * 20 / 100) + wallet.coreWallet;
-                rewardPoint = newReward;
+                rewardPoint = comReward;
                 let tradeWallet = wallet.tradeWallet + (newReward / 10);
                 let ecoWallet = wallet.ecoWallet + (newReward / 10);
                 await walletModel.findOneAndUpdate({ userId: data[index].userId }, { $set: { coreWallet: coreWallet, tradeWallet:tradeWallet, ecoWallet: ecoWallet } });
                 await productModel.findOneAndUpdate({ _id: data[index]._id, userId: data[index].userId }, { $set: { claimedCommunityRewards: claimedCommunityRewards, productStatus: "Completed", pendingReward: pendingRewards, extraRewards:extraRewards } })
             }
         }
-        if(rewardPoint==0){
+        if(rewardPoint > 0){
             let community = {
                 userId: data[index].userId,
                 username: data[index].username,
