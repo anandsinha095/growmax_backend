@@ -4,7 +4,7 @@ let passiveReward = Schema({
     package: { type: String, trim: true },
     packageId: { type: String, trim: true },
     price:{type: String, trim: true },
-    roi:{type: String, trim: true },
+    roi:{type: Number, trim: true },
     reward: { type: Number, trim: true},
     pendingReward: { type: Number, trim: true},
     totalReward: { type: Number, trim: true},
