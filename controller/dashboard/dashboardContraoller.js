@@ -29,7 +29,7 @@ const displayData = async (req, res) => {
             totalReward = totalReward + element.totalRewards;
             passiveReward = passiveReward + element.claimedPassiveRewards;
             pending = pending + element.pendingReward;
-            //communityReward = communityReward + element.claimedCommunityRewards;
+            communityReward = communityReward + element.claimedCommunityRewards;
         }); 
        // console.log(">>>>>>>>>communityReward", communityReward);
         // eco and trade needs to add
@@ -49,10 +49,10 @@ const displayData = async (req, res) => {
         var walletData =  await walletModel.findOne({userId:userId});
         let pendingReward = totalReward - (walletData.coreWallet + walletData.tradeWallet + walletData.ecoWallet);
         var communityIncome =  await communityRewardModel.find({userId:userId})
-        communityIncome.forEach(element => {
-            communityReward = communityReward + element.reward;
-            });
-            console.log("communityReward",communityReward); 
+        // communityIncome.forEach(element => {
+        //     communityReward = communityReward + element.reward;
+        //     });
+        //     console.log("communityReward",communityReward); 
         return responseHandler(res, 200, "Success", {totalCourse: courses, totalReward: totalReward, pendingReward: pending, passiveReward: passiveReward, coreWallet: walletData.coreWallet, leg: leg, totalbusiness: totalbusiness, businessIn24h: businessIn24h, ecoWallet: walletData.ecoWallet, tradeWallet: walletData.tradeWallet,  communityReward: communityReward})       
     }
     catch (e) { return responseHandler(res, 500, "Internal Server Error.", e) }
