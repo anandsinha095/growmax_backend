@@ -228,10 +228,10 @@ async function communityRewardDistribute() {
         const rewardPoint = data[index].rewardPoint - (data[index].rewardPoint * 20 / 100)
         const product = await productModel.find({ userId: data[index].userId, productStatus: "Active" });
         for (let i = 0; i < product.length; i++) {
-            var comReward = rewardPoint / product.length;
+            var comReward = data[index].rewardPoint / product.length;
             if (comReward < product[i].pendingReward) {
-                var claimedCommunityRewards = product[i].claimedCommunityRewards + comReward;
-                var pendingRewards = product[i].pendingReward - data[index].rewardPoint;
+                var claimedCommunityRewards = product[i].claimedCommunityRewards + comReward; // 100 % reward distributed in package 
+                var pendingRewards = product[i].pendingReward - data[index].rewardPoint;// 100 % reward deducted
                 await productModel.findOneAndUpdate({ _id: product[i]._id, userId: data[index].userId }, { $set: { claimedCommunityRewards: claimedCommunityRewards, pendingReward: pendingRewards, productStatus: "Active" } })
             }
             else if (comReward == product[i].pendingReward) {
