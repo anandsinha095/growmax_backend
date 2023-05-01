@@ -4,10 +4,10 @@
     "app_name": "Growmax",
     "app_desc": "Growmax",
     "json_indentation": 4,
-    "database": "mongodb://localhost:27017/GrowMaxx",
+    "database": "mongodb+srv://growmaxx:RGrb0OK3UDJVVdYk@cluster0.cm0qosy.mongodb.net/growmaxx?retryWrites=true&w=majority",
     "fontend_host": "https://growmaxxdashboard.com",
-    "host": "http://43.205.112.88:5000",
-    "nodeMailerEmail": "email.new.tester2014@gmail.com",
-    "nodeMailerPass": "maiplzlmrjfmhara"
+    "host": "https://growmaxxdashboard.com",
+    "nodeMailerEmail": "info@growmaxxacademy.com",
+    "nodeMailerPass": "Kamble@Kapil2023"
   }
 }

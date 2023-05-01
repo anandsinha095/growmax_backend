@@ -140,11 +140,35 @@ const userInfo = async (req, res) => {
     catch (e) { return responseHandler(res, 500, "Internal Server Error.", e) }
 }
 
+const verifyEmailId = async (req, res) =>{
+    let check_email_exist = await userModel.findOne({ email: req.body.email })
+    if (check_email_exist) return responseHandler(res, 403, "email already exist")
+    else 
+    return responseHandler(res, 200, "ok")
+}
+
+const verifyUsername = async (req, res) =>{
+    let check_username_exist = await userModel.findOne({ username: username })
+    if (check_username_exist) return responseHandler(res, 403, "Username already exist")
+    else 
+    return responseHandler(res, 200, "ok")
+}
+
+const verifyReferral = async (req, res) =>{
+    let check_referral_exist = await userModel.findOne({ username: req.body.referralCode })
+    if (!check_referral_exist) return responseHandler(res, 403, "Referral ID doesn't exist")
+    else 
+    return responseHandler(res, 200, "ok", check_referral_exist)
+}
+
 
 
 module.exports = {
     signUp: signUp,
     signIn:signIn,
     userInfo:userInfo,
-    firstIdSignUp:firstIdSignUp
+    firstIdSignUp:firstIdSignUp,
+    verifyUsername:verifyUsername,
+    verifyEmailId:verifyEmailId,
+    verifyReferral: verifyReferral
 }

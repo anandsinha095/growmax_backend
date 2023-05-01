@@ -121,7 +121,7 @@ module.exports = {
     /* Send Mail After when User Sign Up */
     sendMail: async (to, subj, text, link) => {
         try {
-            let transporter = await nodemailer.createTransport({ service: 'gmail', auth: { user: nodeMailerEmail, pass: nodeMailerPass } })
+            let transporter = await nodemailer.createTransport({ service: 'smtp.hostinger.com', auth: { user: nodeMailerEmail, pass: nodeMailerPass } })
             let messageObj = {
                 from: 'test',
                 to: to,

@@ -7,6 +7,7 @@ import tokenModel from '../../model/commonModel/token';
 /* To verify the user Email */
 const check_Link_for_emailVerified = async (req, res) => {
     try {
+        console.log(">>>>>here", req.body);
         const userObj =  await userModel.findOne({ _id: req.user });
         if (userObj.emailVerified == true) return responseHandler(res, 406, "Email Id Already Verified.");
         const data = await tokenModel.findOne({ userId: req.user, type: 'EMAILV' });
