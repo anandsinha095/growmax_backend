@@ -1,6 +1,6 @@
 import express from 'express';
 import mongoose from "mongoose"
-import { mongo_url } from './envirnoment/config'
+import { mongo_url, mongo_password, mongo_user } from './envirnoment/config'
 import authRoute from './router/userRouter/userRouter.js'
 import orderRoute from './router/orderRouter/orderRouter.js'
 import adminRoute from './router/adminRouter/adminRouter.js'
@@ -45,11 +45,24 @@ app.use('/api/v1/dashboard', dashboardRoute)
 mongoose.set('useNewUrlParser', true);
 mongoose.set('useFindAndModify', false);
 mongoose.set('useCreateIndex', true);
-mongoose.connect(mongo_url, {useNewUrlParser: true, useUnifiedTopology: true}).then(done => {
-  console.log("DataBase Connected")
-}).catch(err => {
-  console.log("DataBase not Connected", err)
-})
+// mongoose.connect(mongo_url, {useNewUrlParser: true, useUnifiedTopology: true}).then(done => {
+//   console.log("DataBase Connected")
+// }).catch(err => {
+//   console.log("DataBase not Connected", err)
+// })
+
+// Connect Mongo DB Database 
+try {
+  mongoose.connect(mongo_url, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    user: mongo_user,
+    pass: mongo_password,
+  });
+  console.log('Connected to MONGO DB for growmaxx-backend !');
+} catch (error) {
+  console.log(error, 'Error in connecting to DB !');
+}
 
 let server = app.listen(port);
 console.log(" N O D E     S E R V E R     C O N N E C T E D ")

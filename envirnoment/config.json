@@ -7,6 +7,8 @@
     "database": "mongodb+srv://growmaxx:RGrb0OK3UDJVVdYk@cluster0.cm0qosy.mongodb.net/growmaxx?retryWrites=true&w=majority",
     "fontend_host": "https://growmaxxdashboard.com",
     "host": "https://growmaxxdashboard.com",
+    "mongo_user": "growmaxx",
+    "mongo_password":"RGrb0OK3UDJVVdYk",
     "nodeMailerEmail": "info@growmaxxacademy.com",
     "nodeMailerPass": "Kamble@Kapil2023"
   }
