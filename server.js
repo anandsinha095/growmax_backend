@@ -1,6 +1,7 @@
 import express from 'express';
 import mongoose from "mongoose"
 import { mongo_url, mongo_password, mongo_user } from './envirnoment/config'
+//import { mongo_url } from './envirnoment/config'
 import authRoute from './router/userRouter/userRouter.js'
 import orderRoute from './router/orderRouter/orderRouter.js'
 import adminRoute from './router/adminRouter/adminRouter.js'
@@ -59,7 +60,7 @@ try {
     user: mongo_user,
     pass: mongo_password,
   });
-  console.log('Connected to MONGO DB for growmaxx-backend !');
+  console.log('Connected to MONGO DB for Growmaxx-backend !');
 } catch (error) {
   console.log(error, 'Error in connecting to DB !');
 }

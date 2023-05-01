@@ -1,15 +1,15 @@
 {
-  "dev": {
-    "config_id": "dev",
-    "app_name": "Growmax",
-    "app_desc": "Growmax",
-    "json_indentation": 4,
-    "database": "mongodb+srv://growmaxx:RGrb0OK3UDJVVdYk@cluster0.cm0qosy.mongodb.net/growmaxx?retryWrites=true&w=majority",
-    "fontend_host": "https://growmaxxdashboard.com",
-    "host": "https://growmaxxdashboard.com",
-    "mongo_user": "growmaxx",
-    "mongo_password":"RGrb0OK3UDJVVdYk",
-    "nodeMailerEmail": "info@growmaxxacademy.com",
-    "nodeMailerPass": "Kamble@Kapil2023"
-  }
+    "dev": {
+      "config_id": "dev",
+      "app_name": "Growmax",
+      "app_desc": "Growmax",
+      "json_indentation": 4,
+      "database": "mongodb+srv://growmaxx:RGrb0OK3UDJVVdYk@cluster0.cm0qosy.mongodb.net/growmaxx?retryWrites=true&w=majority",
+      "fontend_host": "https://growmaxxdashboard.com",
+      "host": "https://growmaxxdashboard.com",
+      "mongo_user": "growmaxx",
+      "mongo_password":"RGrb0OK3UDJVVdYk",
+      "nodeMailerEmail": "email.new.tester2014@gmail.com",
+      "nodeMailerPass": "maiplzlmrjfmhara"
+    }
 }

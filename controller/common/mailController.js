@@ -7,7 +7,6 @@ import tokenModel from '../../model/commonModel/token';
 /* To verify the user Email */
 const check_Link_for_emailVerified = async (req, res) => {
     try {
-        console.log(">>>>>here", req.body);
         const userObj =  await userModel.findOne({ _id: req.user });
         if (userObj.emailVerified == true) return responseHandler(res, 406, "Email Id Already Verified.");
         const data = await tokenModel.findOne({ userId: req.user, type: 'EMAILV' });
@@ -26,7 +25,7 @@ const check_Link_for_emailVerified = async (req, res) => {
 const resendMail_For_Verify_Email = async (req, res) => {
     if (!req.body.emailId) return responseHandler(res, 400, "Bad Request")
     try {
-        let check__id_exist = (await userModel.findOne({ email: req.body.emailId })) || (await vendorModel.findOne({ email: req.body.emailId })) || (await customerModel.findOne({ email: req.body.emailId }))
+        let check__id_exist = (await userModel.findOne({ email: req.body.emailId })) 
         if (!check__id_exist) return responseHandler(res, "404", "Invalid Credentials")
         let tokenExist = await tokenModel.findOne({ userId: check__id_exist._id, type: "EMAILV" })
         if (tokenExist) return responseHandler(res, "462", "Please Try After Ten Minutes.")
