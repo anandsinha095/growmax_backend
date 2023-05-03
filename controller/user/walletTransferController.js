@@ -116,9 +116,11 @@ async function rewardBooster() {
             let activePackage = await productModel.find({ productStatus: "Active", userId: data[index].userId });
             for (let i = 0; i < reward.length; i++) {
                 console.log(">>>>>>time now", datetime, reward[i].userId);
-                console.log("reward[i].createdAt", reward[i].createdAt, reward[i].userId);
+               
                 //var rewardPoint = 0;
                 var timeTestCommunity = await checkCommunityReward(reward[i].userId, reward[i]._id, reward[i].createdAt);
+                console.log("reward[i].createdAt", timeTestCommunity.updatedAt,  reward[i].userId);
+                console.log(">>>>>>>>>timeTestCommunity.updatedAt <= datetime", timeTestCommunity.updatedAt <= datetime);
                 if (timeTestCommunity.updatedAt <= datetime) {
                     var product = await productModel.findOne({ _id: data[index]._id });
                     var comReward = (reward[i].rewardPoint / activePackage.length).toFixed(12);
@@ -212,7 +214,7 @@ async function updateWalletBalance(userId, passiveReward) {
     await walletModel.findOneAndUpdate({ userId: userId }, { $set: { coreWallet: coreWallet } });
 }
 
-setInterval(rewardBooster, 30000);
+setInterval(rewardBooster, 60000);
 
 module.exports = {
     coreToTrade: coreToTrade,
