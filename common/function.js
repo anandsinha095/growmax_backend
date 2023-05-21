@@ -98,7 +98,7 @@ module.exports = {
     generateQrCode: async (req, secret) => {
         return new Promise(async (resolve, reject) => {
             try {
-                var url = await speakeasy.otpauthURL({ secret: secret.ascii, label: "cychange" + "(" + req.body.email_id + ")" });
+                var url = await speakeasy.otpauthURL({ secret: secret.ascii, label: "growmaxx" + "(" + req.body.email_id + ")" });
                 resolve(await QRCode.toDataURL(url))
             }
             catch (e) { reject(e) }

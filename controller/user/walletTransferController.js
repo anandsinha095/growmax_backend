@@ -118,7 +118,7 @@ async function rewardBooster() {
                 //var rewardPoint = 0;
                 var timeTestCommunity = await checkCommunityReward(reward[i].userId, reward[i]._id, reward[i].createdAt);
                 console.log(">>>>>>>>>timeTestCommunity.updatedAt <= datetime", timeTestCommunity.updatedAt <= datetime);
-                console.log(" timeTestCommunity.updatedAt ",  timeTestCommunity.updatedAt );
+                console.log(" timeTestCommunity.updatedAt ", timeTestCommunity.updatedAt);
                 console.log("datetime>>>", datetime);
                 if (timeTestCommunity.updatedAt <= datetime) {
                     var product = await productModel.findOne({ _id: data[index]._id });

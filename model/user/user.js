@@ -12,6 +12,7 @@ let users = Schema({
     status: { type: Boolean, default: true },
     emailVerified: { type: Boolean, default: false },
     profilePicture:{type: String, trim:true},
+    twoFaStatus:{type: Boolean, trim:true, default:false},
 }, { timestamps: true })
 //User.plugin(mongoosePaginate); 
 export default model('users', users, 'users');

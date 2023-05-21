@@ -7,6 +7,8 @@ import orderRoute from './router/orderRouter/orderRouter.js'
 import adminRoute from './router/adminRouter/adminRouter.js'
 import publicRoute from './router/common/publicRouter'
 import dashboardRoute from './router/userRouter/dashboardRoute'
+import withdrawRoute from './router/withdrawRouter/withdrawRouter'
+import qrRoute from './router/userRouter/qrRoute'
 import { json, urlencoded } from 'body-parser';
 /* import cors for outside request(Resolve the cross origin issue) */
 import cors from 'cors';
@@ -43,6 +45,8 @@ app.use('/api/v1/order', orderRoute)
 app.use('/api/v1/admin', adminRoute)
 app.use('/api/v1/public', publicRoute)
 app.use('/api/v1/dashboard', dashboardRoute)
+app.use('/api/v1/withdraw', withdrawRoute)
+app.use('/api/v1/qr', qrRoute)
 mongoose.set('useNewUrlParser', true);
 mongoose.set('useFindAndModify', false);
 mongoose.set('useCreateIndex', true);

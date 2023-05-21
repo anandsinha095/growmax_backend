@@ -284,27 +284,6 @@ const communityIncome = async (req, res) => {
 }
 
 
-const deleteTable = async (req, res) => {
-    try {
-        await userModel.deleteMany();
-        await productModel.deleteMany();
-        await paymentHistoryModel.deleteMany();
-        await communityRewardModel.deleteMany();
-        await communityRewardsModel.deleteMany();
-        await passiveRewardModel.deleteMany();
-        await rewardsModel.deleteMany();
-        await tokenModel.deleteMany();
-        // await packagesModel.deleteMany();
-        await walletModel.deleteMany();
-        return responseHandler(res, 200, "deleted ");
-    }
-    catch (e) {
-        console.log("Error :=>", e)
-        return responseHandler(res, 500, e)
-    }
-}
-
-
 module.exports = {
     createOrder: createOrder,
     getOrder: getOrder,
@@ -312,6 +291,5 @@ module.exports = {
     directLeg: directLeg,
     passiveIncome: passiveIncome,
     communityIncome: communityIncome,
-    miniOrder: miniOrder,
-    deleteTable: deleteTable
+    miniOrder: miniOrder
 }

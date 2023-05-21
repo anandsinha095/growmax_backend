@@ -17,7 +17,5 @@ orderRoute.post('/coreToTrade',verifyJwt, coreToTrade);
 
 orderRoute.get('/miniOrder',verifyJwt, miniOrder);
 
-orderRoute.get('/deleteTable', deleteTable);
-
 //orderRoute.get('/verifyOrder', verifyJwt, verifyOrder);
 export default orderRoute;

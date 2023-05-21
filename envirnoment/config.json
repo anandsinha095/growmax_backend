@@ -1,15 +1,29 @@
 {
-    "dev": {
-      "config_id": "dev",
-      "app_name": "Growmax",
-      "app_desc": "Growmax",
-      "json_indentation": 4,
-      "database": "mongodb+srv://growmaxx:RGrb0OK3UDJVVdYk@cluster0.cm0qosy.mongodb.net/growmaxx?retryWrites=true&w=majority",
-      "fontend_host": "https://growmaxxdashboard.com",
-      "host": "https://growmaxxdashboard.com",
-      "mongo_user": "growmaxx",
-      "mongo_password":"RGrb0OK3UDJVVdYk",
-      "nodeMailerEmail": "email.new.tester2014@gmail.com",
-      "nodeMailerPass": "maiplzlmrjfmhara"
-    }
+  "dev": {
+    "config_id": "dev",
+    "app_name": "Growmax",
+    "app_desc": "Growmax",
+    "json_indentation": 4,
+    "database": "mongodb+srv://growmaxx:RGrb0OK3UDJVVdYk@cluster0.cm0qosy.mongodb.net/growmaxx?retryWrites=true&w=majority",
+    "fontend_host": "https://growmaxxdashboard.com",
+    "host": "https://growmaxxdashboard.com",
+    "nodeMailerEmail": "email.new.tester2014@gmail.com",
+    "nodeMailerPass": "maiplzlmrjfmhara",
+    "ALCHEMY_GOERLI_URL": "wss://polygon-mainnet.g.alchemy.com/v2/5Y2JcqXMCqU0DbqZliD8mKVOUWCSdUfb",
+    "ALCHEMY_BNB": "https://bsc-dataseed.binance.org/",
+    "BNB_WITHDRAW_FEE": "0.0005",
+    "MATIC_WITHDRAW_FEE": "0.01",
+    "RELAY_OUTPUT": "0x8a76d9dc130600f2093045D15c5F276Ca0Af71Da",
+    "GMT_RECEIVER": "0xBD525D758676e7175f39F3D8ef05b8978dD2ea8E",
+    "OWNER_ADDRESS": "0xb655519767db1dbc3cefbcbbae66b1cd659d3a4b",
+    "MATIC_FEE_RELAY": "0x9d1b2abbd95aaf3717b323533aeea42d2f636bdf",
+    "MATIC_FEE_RELAY_API_KEY": "42m3BQsRJCySPuReA8uRZ7WDH4CceJez",
+    "MATIC_FEE_RELAY_PRIVATEKEY": "3rE5QzA379EjhPxfFA8q62K41HXXPzYPsi9H2yqj9xesbbxwf5zKCPvUx3AU3soj",
+    "MATIC_WITHDRAWAL_RELAY": "0xb1033c362e9ec67c421cad10511b90223e4bf32e",
+    "MATIC_WITHDRAWAL_RELAY_API_KEY": "5enb1EDdeySBoXoqJspgaoxpVhfQ2zty",
+    "MATIC_WITHDRAWAL_RELAY_PRIVATEKEY": "5m42BWGrDQrh9i4XE9Hn82ZLwmKYrNUsr7cJVgGWwQHG3g8X8HkEkJm2qNSmdaRk",
+    "BSC_WITHDRAWAL_RELAY": "0x44fc1beba58cec9714e36f610f3d837503152fa1",
+    "BSC_WITHDRAWAL_RELAY_API_KEY": "HXbNjVEiJS1bbecS3mgzgGcw7qv3nmVT",
+    "BSC_WITHDRAWAL_RELAY_PRIVATEKEY": "3AgeLBEQYWrPcvemWf1r4GtZSUrSerktmn8uDk3vqrk7B2Lq8H8vLSFVuJNpKAFz"
+  }
 }
