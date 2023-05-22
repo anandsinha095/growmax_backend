@@ -8,7 +8,7 @@ let withdrawHistory = Schema({
     orderId: { type: String, trim: true},
     asset: {type: String, trim: true},
     gmtAmount: { type: Number, trim: true},
-    orderStatus: { type: String, default: "PENDING", enum: ["PENDING", "CANCEL", "COMPLETE"] },
+    orderStatus: { type: String, default: "PENDING", enum: ["PENDING", "CANCEL", "COMPLETED"] },
     fee: { type: Number, trim: true },
     slippage: {type: Number, trim: true},
     totalAmount: { type: Number, default: true },

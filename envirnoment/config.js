@@ -30,8 +30,9 @@ export const MATIC_WITHDRAWAL_RELAY_PRIVATEKEY = finalConfig.MATIC_WITHDRAWAL_RE
 export const BSC_WITHDRAWAL_RELAY = finalConfig.BSC_WITHDRAWAL_RELAY
 export const BSC_WITHDRAWAL_RELAY_API_KEY = finalConfig.BSC_WITHDRAWAL_RELAY_API_KEY
 export const BSC_WITHDRAWAL_RELAY_PRIVATEKEY = finalConfig.BSC_WITHDRAWAL_RELAY_PRIVATEKEY
+export const MATIC_WITHDRAW_WALLET = finalConfig.MATIC_WITHDRAW_WALLET
 
-
+// BNB:  0x5867789e1FeeBe8008F912872d260AE5D3E0F08A
 // const config=require('./config.json')
 // const envirnoment= process.env.NODE_ENV || 'dev';
 // const finalConfig= config[envirnoment];

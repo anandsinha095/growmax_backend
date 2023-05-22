@@ -6,6 +6,7 @@ import rewardsModel from '../../model/rewards/rewards';
 import passiveRewardModel from '../../model/rewards/passive';
 import communityRewardModel from '../../model/rewards/community';
 import walletModel from '../../model/rewards/wallet'
+import { verifyJwtToken } from '../../common/function';
 import { host, angular_port } from '../../envirnoment/config'
 
 /***************** Create Order by User ******************/

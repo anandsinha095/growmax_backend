@@ -24,18 +24,20 @@ const providerMatic = new ethers.WebSocketProvider(ALCHEMY_GOERLI_URL, 137);
 const providerBNB = new ethers.JsonRpcProvider(ALCHEMY_BNB);
 const credentials = { apiKey: MATIC_FEE_RELAY_API_KEY, apiSecret: MATIC_FEE_RELAY_PRIVATEKEY };
 const provider = new DefenderRelayProvider(credentials);
-const signer = new DefenderRelaySigner(credentials, provider, { speed: 'fast' });
+const signer = new DefenderRelaySigner(credentials, provider, { speed: 'fastest' });
 const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
 
 // Matic withdrawal relay
 const maticCredentials = { apiKey: MATIC_WITHDRAWAL_RELAY_API_KEY, apiSecret: MATIC_WITHDRAWAL_RELAY_PRIVATEKEY };
 const maticProvider = new DefenderRelayProvider(maticCredentials);
-const maticSigner = new DefenderRelaySigner(maticCredentials, maticProvider, { speed: 'fast' });
+const maticSigner = new DefenderRelaySigner(maticCredentials, maticProvider, { speed: 'fastest' });
+
+
 
 // BNB withdrawal relay
 const bnbCredentials = { apiKey: BSC_WITHDRAWAL_RELAY_API_KEY, apiSecret: BSC_WITHDRAWAL_RELAY_PRIVATEKEY };
 const bnbProvider = new DefenderRelayProvider(bnbCredentials);
-const bnbSigner = new DefenderRelaySigner(bnbCredentials, bnbProvider, { speed: 'fast' });
+const bnbSigner = new DefenderRelaySigner(bnbCredentials, bnbProvider, { speed: 'fastest' });
 
 module.exports = {
     /**
@@ -263,8 +265,9 @@ module.exports = {
     transferMatic: async (receiverAddress, amount) => {
         return new Promise(async (resolve, reject) => {
             try {
-                console.log(">>>>>>>>>>>>matic In");
-                // let wallet = new ethers.Wallet(MATIC_PRIVATEKEY, providerMatic);
+                console.log(">>>>>>>>>>>>matic In", amount);
+                const feeData = await providerMatic.getFeeData();
+              //  const walletWithProvider = new ethers.Wallet(privateKey, providerMatic);
                 let tx = {
                     to: receiverAddress,
                     value: ethers.parseEther(amount.toString(), 18)
@@ -285,6 +288,7 @@ module.exports = {
    *
    * */
     transferMaticByRelay: async (receiverAddress) => {
+        console.log(">>>>>>>>>>>>transferMaticByRelay receiverAddress", receiverAddress);
         return new Promise(async (resolve, reject) => {
             try {
                 const amount = "0.1";
@@ -295,6 +299,7 @@ module.exports = {
                 }
                 // Send a transaction
                 const txnData = await signer.sendTransaction(tx);
+                console.log(">>>>>>>>>>transferMaticByRelay>>txnData", txnData);
                 return resolve(txnData);
             }
             catch (e) {
