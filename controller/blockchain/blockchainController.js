@@ -20,13 +20,17 @@ const transferFund = async (req, res) => {
         if (!req.body.coin || !req.body.gmt) {
             return responseHandler(res, 400, "Bad request");
         }
+        console.log(">>>>>>>>1");
         const gmtTxId = Date.now();
         let userId = await verifyJwtToken(req, res);
         let check_user_exist = await userModel.findOne({ _id: userId })
+        console.log(">>>>>>>>2");
         if (!check_user_exist) return responseHandler(res, 461, "User doesn't exist")
         const userAddress = await account(userId); // User Address 
+        console.log(">>>>>>>>3");
         const checkbalance = await coreWalletBalance(userId) // core wallet current balance
         var userBalance = await getBalanceUser(userAddress.address); // your blockchain balance
+        console.log(">>>>>>>>userBalance", userBalance);
         if (parseFloat(userBalance) < 0) {
             return responseHandler(res, 403, "We are working on your Growmaxx account setup. Please try to withdraw after 10 mins");
         }
@@ -147,9 +151,11 @@ async function livePrice(coin) {
 async function checkApproval(userId, userAddress, corebalance, gmt){
     console.log(">>>>>>>checkApproval userAddress", userAddress );
     console.log(">>>>>>>checkApproval corebalance", corebalance );
+    console.log("userAddress.approveAmount>>>>>>", userAddress.approveAmount);
     if (userAddress.approveAmount == 0) {
         const approveEpd = corebalance - gmt;
         const approval = await approve(userAddress.privatekey, corebalance);
+        console.log("checkApproval>>>>>>", approval);
         if (approval) {
             await addressModel.findOneAndUpdate({ userId: userId }, { $set: { approveAmount: corebalance, approveExpend: approveEpd } })
             return;

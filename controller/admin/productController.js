@@ -48,13 +48,14 @@ const usersWallet= async (req, res) => {
 }
 
 const findWallet= async (req, res) => {
-
+    var useremail=  await userModel.findOne({email:"mohanrajchaudhary143@gmail.com"});
+    console.log(">>>>>>>>useremail", useremail);
 // users._id>>> 64501c1579e368d956c8372c
-    var wallet =  await walletModel.find({userId:"64501c1579e368d956c8372c"});
-  var user=  await userModel.findOne({_id:"64501c1579e368d956c8372c"});
-    console.log(user);
-    await walletModel.deleteOne({userId:"64501c1579e368d956c8372c"});
-    return responseHandler(res, 200, "OK", wallet);
+//     var wallet =  await walletModel.find({userId:"64501c1579e368d956c8372c"});
+//   var user=  await userModel.findOne({_id:"64501c1579e368d956c8372c"});
+//     console.log(user);
+//     await walletModel.deleteOne({userId:"64501c1579e368d956c8372c"});
+    return responseHandler(res, 200, "OK", useremail);
 }
 module.exports = {
     getWalletBalance: getWalletBalance,
