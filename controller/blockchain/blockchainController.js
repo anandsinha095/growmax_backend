@@ -20,24 +20,27 @@ const transferFund = async (req, res) => {
         if (!req.body.coin || !req.body.gmt) {
             return responseHandler(res, 400, "Bad request");
         }
-        console.log(">>>>>>>>1");
+        console.log(">>>>>>>>1req.body", req.body);
         const gmtTxId = Date.now();
         let userId = await verifyJwtToken(req, res);
         let check_user_exist = await userModel.findOne({ _id: userId })
-        console.log(">>>>>>>>2");
         if (!check_user_exist) return responseHandler(res, 461, "User doesn't exist")
         const userAddress = await account(userId); // User Address 
-        console.log(">>>>>>>>3");
+        console.log(">>>>>>>>userAddress", userAddress.address);
         const checkbalance = await coreWalletBalance(userId) // core wallet current balance
+        console.log(">>>>>>>>checkbalance",checkbalance);
         var userBalance = await getBalanceUser(userAddress.address); // your blockchain balance
         console.log(">>>>>>>>userBalance", userBalance);
+        console.log(">>>>>>>>parseFloat(userBalance) < 0", parseFloat(userBalance) < 0);
         if (parseFloat(userBalance) < 0) {
             return responseHandler(res, 403, "We are working on your Growmaxx account setup. Please try to withdraw after 10 mins");
         }
+        console.log(">>>>>>>>checkbalance < req.body.gmt", checkbalance < req.body.gmt);
         if (checkbalance < req.body.gmt) {
             return responseHandler(res, 403, "You don't have sufficient fund for withdraw");
         }
         const wallet = await withdrawModel.findOne({ userId: userId });
+        console.log(">>>>>>>>wallet", wallet);
         if (req.body.coin == 'BNB' && (wallet.bnb == null || wallet.bnb == undefined)) {
             return responseHandler(res, 403, "Please set your withdraw BNB address before withdraw");
         }
@@ -46,6 +49,7 @@ const transferFund = async (req, res) => {
         }
         // approval setup 
        // var corebalance = checkbalance;
+        console.log(">>>>>checkApproval");
         await checkApproval(userId, userAddress, checkbalance, req.body.gmt);
         // Price calculation in  USD
         const bitcoinObject = await livePrice(req.body.coin)
@@ -54,6 +58,7 @@ const transferFund = async (req, res) => {
         const relayAmount = (req.body.gmt * 1 / 100) / bitcoinObject;
         // checking balance bnb
         var coinBalance = await getBalance(req.body.coin);
+        console.log(">>>>>coinBalance", coinBalance);
         if (coinBalance < (amount + relayAmount)) {
             return responseHandler(res, 403, "Something went wrong !! Please Try after sometime");
         }
@@ -73,6 +78,7 @@ const transferFund = async (req, res) => {
             slippage: relayAmount,
             totalAmount: amount
         }
+        console.log(">>>>>createOrder", createOrder);
         await withdrawHistoryModel.create(createOrder)
         // update core wallet balance
         const coreWallet = checkbalance - req.body.gmt;

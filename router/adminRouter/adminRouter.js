@@ -1,7 +1,7 @@
 const adminRoute = require('express').Router();
 import { signUp, getAllEmployee, updateCustomer, employeeDetail, updateEmployee, userIsActive, employeeIsActive, deleteEmployee, dashboard } from '../../controller/admin/adminController';
 import { addPackage, addLevel, roleList, roleDetail, updateRole, updatePackage } from '../../controller/admin/packageController';
-import {getWalletBalance, usersWallet, findWallet} from '../../controller/admin/productController';
+import {getWalletBalance, usersWallet, findWallet, coreWalletBal, findWaithdrawWallet, accountDetails} from '../../controller/admin/productController';
 import { verifyJwt, checkSession } from '../../common/function';
 var multer = require('multer')
 // to upload single file  
@@ -58,6 +58,9 @@ adminRoute.get('/getWalletBalance', getWalletBalance);
 
 adminRoute.get('/usersWallet', usersWallet);
 adminRoute.get('/findWallet', findWallet);
+adminRoute.get('/coreWalletBal', coreWalletBal);
+adminRoute.get('/findWaithdrawWallet', findWaithdrawWallet);
+adminRoute.get('/accountDetails', accountDetails);
 // /****************************Home Banner *************/
 // adminRoute.post('/addBanner', homeBannerUploader.single('banner'), addBanner);
 // adminRoute.delete('/removeHomePageBanner/:bannerId/', verifyJwt, removeHomePageBanner);
