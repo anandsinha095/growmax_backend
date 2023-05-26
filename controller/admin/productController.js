@@ -52,7 +52,7 @@ const usersWallet = async (req, res) => {
 const findWallet = async (req, res) => {
     //var useremail=  await userModel.findOne({email:"mohanrajchaudhary143@gmail.com"});
     // console.log(">>>>>>>>useremail", useremail);
-    var useremail=  await userModel.findOne({_id:"645884a3c98eea01578e2638"});
+    var useremail=  await userModel.findOne({_id:"6450632757e9a1dc412fa071"});
     console.log(">>>>>>>>useremail", useremail);
     // users._id>>> 64501c1579e368d956c8372c
     //     var wallet =  await walletModel.find({userId:"64501c1579e368d956c8372c"});
@@ -64,10 +64,10 @@ const findWallet = async (req, res) => {
 const findWaithdrawWallet = async (req, res) => {
     //var useremail=  await userModel.findOne({email:"mohanrajchaudhary143@gmail.com"});
     // console.log(">>>>>>>>useremail", useremail);
-    var useremail=  await withdrawModel.findOne({userId:"645884a3c98eea01578e2638"});
+    var useremail=  await withdrawModel.findOne({userId:"6450632757e9a1dc412fa071"});
     console.log(">>>>>>>>useremail", useremail);
     // users._id>>> 64501c1579e368d956c8372c
-    //     var wallet =  await walletModel.find({userId:"64501c1579e368d956c8372c"});
+    //  var wallet =  await walletModel.findOne({userId:"6459f231c98eea01578e27ab"});
     //   var user=  await userModel.findOne({_id:"64501c1579e368d956c8372c"});
     //     console.log(user);
     //     await walletModel.deleteOne({userId:"64501c1579e368d956c8372c"});
@@ -85,7 +85,7 @@ const coreWalletBal = async (req, res) => {
 
 
 const accountDetails = async (req, res) => {
-    var wallet = await addressModel.findOne({userId:"645884a3c98eea01578e2638"});
+    var wallet = await addressModel.findOne({userId:"6459f231c98eea01578e27ab"});
     return responseHandler(res, 200, "OK", wallet);
 }
 

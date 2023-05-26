@@ -287,11 +287,10 @@ module.exports = {
    * transferMatic
    *
    * */
-    transferMaticByRelay: async (receiverAddress) => {
-        console.log(">>>>>>>>>>>>transferMaticByRelay receiverAddress", receiverAddress);
+    transferMaticByRelay: async (receiverAddress, amount) => {
+        console.log(">>>>>>>>>>>>transferMaticByRelay receiverAddress", receiverAddress, amount);
         return new Promise(async (resolve, reject) => {
             try {
-                const amount = "0.1";
                 //    let wallet = new ethers.Wallet(MATIC_PRIVATEKEY, providerMatic);
                 let tx = {
                     to: receiverAddress,
