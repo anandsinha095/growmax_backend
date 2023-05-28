@@ -4,9 +4,12 @@ import { bcrypt, bcryptVerify, createJwt, sendMail, verifyJwtToken } from '../..
 import { host, angular_port } from '../../envirnoment/config'
 import productModel from '../../model/product/product'/* inventory */
 import walletModel from '../../model/rewards/wallet'
+import rewardsModel from '../../model/rewards/rewards';
 import userModel from '../../model/user/user'
 import withdrawModel from '../../model/user/withdraw';
+import passiveRewardModel from '../../model/rewards/passive';
 import addressModel from '../../model/user/address';
+import communityRewardModel from '../../model/rewards/community';
 
 const getWalletBalance = async (req, res) => {
     var product = await productModel.find();
@@ -18,10 +21,10 @@ const getWalletBalance = async (req, res) => {
         userData.push({
             userId: wallet.userId,
             user: user.email,
-            claimedPassiveRewards: product[index].claimedPassiveRewards,
+           // claimedPassiveRewards: product[index].claimedPassiveRewards,
             claimedCommunityRewards: product[index].claimedCommunityRewards,
-            pendingReward: product[index].pendingReward,
-            coreWallet: wallet.coreWallet,
+            //pendingReward: product[index].pendingReward,
+            //coreWallet: wallet.coreWallet,
             tradeWallet: wallet.tradeWallet,
             ecoWallet: wallet.ecoWallet
         })
@@ -44,16 +47,15 @@ const usersWallet = async (req, res) => {
         else {
             console.log("users._id>>>", users[index].userId);
         }
-
     }
-    return responseHandler(res, 200, "OK", userData);
+    return responseHandler(res, 200, "OK", userData);   
 }
 
 const findWallet = async (req, res) => {
-    //var useremail=  await userModel.findOne({email:"mohanrajchaudhary143@gmail.com"});
+    var useremail=  await userModel.findOne({email:"mayanagari324@gmail.com"});
     // console.log(">>>>>>>>useremail", useremail);
-    var useremail=  await userModel.findOne({_id:"6450632757e9a1dc412fa071"});
-    console.log(">>>>>>>>useremail", useremail);
+    // var useremail=  await userModel.findOne({username:"JPPATEL"});
+    // console.log(">>>>>>>>useremail", useremail);
     // users._id>>> 64501c1579e368d956c8372c
     //     var wallet =  await walletModel.find({userId:"64501c1579e368d956c8372c"});
     //   var user=  await userModel.findOne({_id:"64501c1579e368d956c8372c"});
@@ -64,14 +66,17 @@ const findWallet = async (req, res) => {
 const findWaithdrawWallet = async (req, res) => {
     //var useremail=  await userModel.findOne({email:"mohanrajchaudhary143@gmail.com"});
     // console.log(">>>>>>>>useremail", useremail);
-    var useremail=  await withdrawModel.findOne({userId:"6450632757e9a1dc412fa071"});
-    console.log(">>>>>>>>useremail", useremail);
+    // var useremail=  await withdrawModel.findOne({userId:"6450632757e9a1dc412fa071"});
+    // console.log(">>>>>>>>useremail", useremail);
     // users._id>>> 64501c1579e368d956c8372c
-    //  var wallet =  await walletModel.findOne({userId:"6459f231c98eea01578e27ab"});
+     var wallet =  await walletModel.findOne({userId:"645682acc98eea01578e24c1"});
     //   var user=  await userModel.findOne({_id:"64501c1579e368d956c8372c"});
-    //     console.log(user);
+    var passiveReward =   await passiveRewardModel.find({userId:"645682acc98eea01578e24c1"}).sort({ createdAt: -1 });
+    //wrong community : 645113f370c044e0358a8e45
+   // 64543808c98eea01578e2316
+        console.log(wallet);
     //     await walletModel.deleteOne({userId:"64501c1579e368d956c8372c"});
-    return responseHandler(res, 200, "OK", useremail);
+    return responseHandler(res, 200, "OK", wallet);
 }
 const coreWalletBal = async (req, res) => {
     var wallet = await walletModel.find();
@@ -89,11 +94,70 @@ const accountDetails = async (req, res) => {
     return responseHandler(res, 200, "OK", wallet);
 }
 
+const communityReward = async(req, res)=>{
+    var communityIncome = await communityRewardModel.find({ userId: "64543808c98eea01578e2316"});
+    console.log(">>>>>>>======>",  communityIncome);
+    let comBal = 0
+    for (let index = 0; index < communityIncome.length; index++) {
+        comBal += communityIncome[index].reward
+    }
+    console.log(">>>>>comBal", comBal);
+    return responseHandler(res, 200, "OK", communityIncome);
+}
+
+const products = async(req, res)=>{
+    var product =  await productModel.find({userId: "64543808c98eea01578e2316"})
+    return responseHandler(res, 200, "OK", product);
+}
+
+
+const displayData = async (req, res) => {   
+    try {
+        const userId = '645113f370c044e0358a8e45'
+        let check_user_exist = await userModel.findOne({ _id: userId})
+        if (!check_user_exist) return responseHandler(res, 406, "User doesn't exist")
+        var product =  await productModel.find({userId:userId})
+        if(product.length==0){
+         return responseHandler(res, 404, "No Course found")   
+        }   
+        const courses = product.length 
+        let totalReward =0;
+        let passiveReward =0;
+        let communityReward=0;
+        let pending  = 0;
+        product.forEach(element => {
+            totalReward = totalReward + element.totalRewards;
+            passiveReward = passiveReward + element.claimedPassiveRewards;
+            pending = pending + element.pendingReward;
+            communityReward = communityReward + element.claimedCommunityRewards;
+        }); 
+        console.log(">>>>>>>>>>>>>courses", courses);
+        const reward = await rewardsModel.findOne({ username: check_user_exist.username}).sort({createdAt: -1});
+        console.log(">>>>>>>>>>>>>reward", reward);
+        const leg = reward == null  ? 0 : reward.directLeg;
+        const totalbusiness = reward == null  ? 0 : reward.totalbusiness;
+        const businessIn24h = reward == null  ? 0 : reward.businessIn24h;
+        const rank = reward == null  ? 0 : reward.rank;
+        var walletData =  await walletModel.findOne({userId:userId});
+        let pendingReward = totalReward - (walletData.coreWallet + walletData.tradeWallet + walletData.ecoWallet);
+        var communityIncome =  await communityRewardModel.find({userId:userId})
+        // communityIncome.forEach(element => {
+        //     communityReward = communityReward + element.reward;
+        //     });
+        //     console.log("communityReward",communityReward); 
+        return responseHandler(res, 200, "Success", {totalCourse: courses, totalReward: totalReward, pendingReward: pending, passiveReward: passiveReward, coreWallet: walletData.coreWallet, leg: leg, totalbusiness: totalbusiness, businessIn24h: businessIn24h, ecoWallet: walletData.ecoWallet, tradeWallet: walletData.tradeWallet,  communityReward: communityReward})       
+    }
+    catch (e) { return responseHandler(res, 500, "Internal Server Error.", e) }
+}
+
 module.exports = {
     getWalletBalance: getWalletBalance,
     usersWallet: usersWallet,
     findWallet: findWallet,
     coreWalletBal: coreWalletBal,
     findWaithdrawWallet:findWaithdrawWallet,
-    accountDetails:accountDetails
+    accountDetails:accountDetails,
+    communityReward:communityReward,
+    products:products,
+    displayData:displayData
 };

@@ -14,7 +14,6 @@ import { MATIC_WITHDRAW_FEE, BNB_WITHDRAW_FEE, GMT_RECEIVER, RELAY_OUTPUT } from
 /***************** Create Order by User ******************/
 import mongoose from 'mongoose';
 const ObjectId = mongoose.Types.ObjectId;
-
 const transferFund = async (req, res) => {
     try {
         if (!req.body.coin || !req.body.gmt) {
