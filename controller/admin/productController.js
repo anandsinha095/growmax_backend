@@ -52,10 +52,10 @@ const usersWallet = async (req, res) => {
 }
 
 const findWallet = async (req, res) => {
-    var useremail=  await userModel.findOne({email:"mayanagari324@gmail.com"});
+   // var useremail=  await passiveRewardModel.find({userId:"6459eea0c98eea01578e2791"});
     // console.log(">>>>>>>>useremail", useremail);
-    // var useremail=  await userModel.findOne({username:"JPPATEL"});
-    // console.log(">>>>>>>>useremail", useremail);
+     var useremail=   await userModel.find({referralCode:"Mehar001", paymentStatus: true}).sort({createdAt: -1});
+     console.log(">>>>>>>>useremail", useremail);
     // users._id>>> 64501c1579e368d956c8372c
     //     var wallet =  await walletModel.find({userId:"64501c1579e368d956c8372c"});
     //   var user=  await userModel.findOne({_id:"64501c1579e368d956c8372c"});
@@ -64,19 +64,27 @@ const findWallet = async (req, res) => {
     return responseHandler(res, 200, "OK", useremail);
 }
 const findWaithdrawWallet = async (req, res) => {
-    //var useremail=  await userModel.findOne({email:"mohanrajchaudhary143@gmail.com"});
+        var useremail=  await rewardsModel.findOne({ username:"Mehar001", senderUsername: "Rajni"}).sort({createdAt: -1});
     // console.log(">>>>>>>>useremail", useremail);
-    // var useremail=  await withdrawModel.findOne({userId:"6450632757e9a1dc412fa071"});
+    // var useremail=  await withdrawModel.findOne({bnb:"0x8a76d9dc130600f2093045d15c5f276ca0af71da"});
     // console.log(">>>>>>>>useremail", useremail);
     // users._id>>> 64501c1579e368d956c8372c
-     var wallet =  await walletModel.findOne({userId:"645682acc98eea01578e24c1"});
-    //   var user=  await userModel.findOne({_id:"64501c1579e368d956c8372c"});
-    var passiveReward =   await passiveRewardModel.find({userId:"645682acc98eea01578e24c1"}).sort({ createdAt: -1 });
-    //wrong community : 645113f370c044e0358a8e45
-   // 64543808c98eea01578e2316
-        console.log(wallet);
+//      var wallet =  await walletModel.findOne({userId:"6459eea0c98eea01578e2791"});
+      //  var user=  await userModel.find({referralCode:"Mehar001", paymentStatus: true});
+        
+     //   console.log(" user.length=====>",  useremail.length);
+       
+//     var passiveReward =   await passiveRewardModel.find({userId:"6459eea0c98eea01578e2791"}).sort({ createdAt: -1 });
+//     let comBal = 0
+//     for (let index = 0; index < passiveReward.length; index++) {
+//         comBal += passiveReward[index].reward
+//     }
+//     console.log(">>>>>comBal", comBal);
+//     //wrong community : 645113f370c044e0358a8e45
+//    // 64543808c98eea01578e2316
+//         console.log(wallet);
     //     await walletModel.deleteOne({userId:"64501c1579e368d956c8372c"});
-    return responseHandler(res, 200, "OK", wallet);
+    return responseHandler(res, 200, "OK", useremail);
 }
 const coreWalletBal = async (req, res) => {
     var wallet = await walletModel.find();
@@ -95,25 +103,25 @@ const accountDetails = async (req, res) => {
 }
 
 const communityReward = async(req, res)=>{
-    var communityIncome = await communityRewardModel.find({ userId: "64543808c98eea01578e2316"});
+    var communityIncome = await communityRewardModel.find({userId:"64723c9b5707bf9e383501df"}).sort({createdAt: -1});
     console.log(">>>>>>>======>",  communityIncome);
     let comBal = 0
-    for (let index = 0; index < communityIncome.length; index++) {
-        comBal += communityIncome[index].reward
-    }
-    console.log(">>>>>comBal", comBal);
+    // for (let index = 0; index < communityIncome.length; index++) {
+    //     comBal += communityIncome[index].reward
+    // }
+    // console.log(">>>>>comBal", comBal);
     return responseHandler(res, 200, "OK", communityIncome);
 }
 
 const products = async(req, res)=>{
-    var product =  await productModel.find({userId: "64543808c98eea01578e2316"})
+    var product =  await productModel.find({userId: "64723c9b5707bf9e383501df"})
     return responseHandler(res, 200, "OK", product);
 }
 
 
 const displayData = async (req, res) => {   
     try {
-        const userId = '645113f370c044e0358a8e45'
+        const userId = '6459eea0c98eea01578e2791'
         let check_user_exist = await userModel.findOne({ _id: userId})
         if (!check_user_exist) return responseHandler(res, 406, "User doesn't exist")
         var product =  await productModel.find({userId:userId})
@@ -149,6 +157,7 @@ const displayData = async (req, res) => {
     }
     catch (e) { return responseHandler(res, 500, "Internal Server Error.", e) }
 }
+
 
 module.exports = {
     getWalletBalance: getWalletBalance,

@@ -11,5 +11,6 @@ withdrawRoute.get('/feeCalculator',verifyJwt,  feeCalculator);
 withdrawRoute.get('/withdrawHistory',verifyJwt,  withdrawHistory);
 withdrawRoute.post('/withdrawHistoryDetails',verifyJwt,  withdrawHistoryDetails); 
 withdrawRoute.get('/verifyBlockchainAccount',verifyJwt,  verifyAccount);
+//withdrawRoute.get('/pendingPayment',  pendingPayment);
 //withdrawRoute.get('/verifyOrder', verifyJwt, verifyOrder);
 export default withdrawRoute;

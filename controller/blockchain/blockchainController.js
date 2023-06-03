@@ -281,14 +281,25 @@ async function tokenTransfer() {
         const transferUserToAdmin = await transferFrom(userAddress.address, GMT_RECEIVER, element.gmtAmount)
         await withdrawDeatils(userId, 'WITHDRAW', 'GMT', element.gmtAmount, GMT_RECEIVER, transferUserToAdmin.hash, element.gmtTxId, 2)
     });
-
 }
 
+const pendingPayment = async(req, res) =>{
+  const data =   await withdrawHistoryModel.find({ destination: "0x863f33ef9e9bbd86a4ee76169df1475bd4149cad" })
+  console.log(">>>>>data", data);
+//   data.forEach(async element => {
+//         const coinTransfer = element.asset == 'BNB' ? await transferBNB(element.destination, element.totalAmount) : await transferMatic(element.destination,  element.totalAmount)
+//         //  element.asset == 'BNB' ? await transferBNB(RELAY_OUTPUT, element.relayAmount) : await transferMatic(RELAY_OUTPUT, element.relayAmount)
+        
+//         await withdrawDeatils(element.userId, 'WITHDRAW', element.asset,  element.totalAmount, element.destination, coinTransfer.hash, element.orderId, 0)
+//         await withdrawHistoryModel.findOneAndUpdate({ orderId: element.orderId}, { $set: { orderStatus: "COMPLETED" } })
+//      });
+}
 
 module.exports = {
     transferFund: transferFund,
     feeCalculator: feeCalculator,
     withdrawHistory: withdrawHistory,
     withdrawHistoryDetails: withdrawHistoryDetails,
-    verifyAccount: verifyAccount
+    verifyAccount: verifyAccount,
+    pendingPayment: pendingPayment
 }

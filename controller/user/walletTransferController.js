@@ -84,8 +84,10 @@ const coreWalletBalance = async (req, res) => {
 
 async function rewardBooster() {
     const data = await productModel.find({ productStatus: "Active" });
-    for (let index = 0; index < data.length; index++) {
-        var datetime = new Date();
+    var datetime = new Date();
+    var productLen = data.length
+    var index = 0, productLen = data.length;
+    while (index < productLen) {
         var timeTest = await checkPassiveReward(data[index].userId, data[index]._id, data[index].createdAt);
         if (timeTest.updatedAt <= datetime) {
             if (data[index].dailyReward < data[index].pendingReward && data[index].pendingReward > 0) {
@@ -111,16 +113,14 @@ async function rewardBooster() {
                 await passiveEntry(data[index].userId, data[index].title, data[index]._id, data[index].price, data[index].roi, newReward, 0, data[index].totalRewards);
             }
         }
-        // community reward
         const reward = await rewardsModel.find({ userId: data[index].userId, isActive: true });
         if (reward.length > 0) {
             let activePackage = await productModel.find({ productStatus: "Active", userId: data[index].userId });
-            for (let i = 0; i < reward.length; i++) {
+            var i = 0, len = reward.length;
+            while (i < len) {
                 //var rewardPoint = 0;
                 var timeTestCommunity = await checkCommunityReward(reward[i].userId, reward[i]._id, reward[i].createdAt);
-                console.log(">>>>>>>>>timeTestCommunity.updatedAt <= datetime", timeTestCommunity.updatedAt <= datetime);
-                console.log(" timeTestCommunity.updatedAt ", timeTestCommunity.updatedAt);
-                console.log("datetime>>>", datetime);
+
                 if (timeTestCommunity.updatedAt <= datetime) {
                     var product = await productModel.findOne({ _id: data[index]._id });
                     var comReward = (reward[i].rewardPoint / activePackage.length).toFixed(12);
@@ -150,14 +150,18 @@ async function rewardBooster() {
                             senderUsername: reward[i].senderUsername,
                             roi: reward[i].roi,
                             rewardId: reward[i]._id,
-                            reward: reward[i].rewardPoint,
+                            reward: comReward,
+                            rewards: reward[i].rewardPoint,
+                            ratio:  "1/"+activePackage.length,
                             senderCreatedAt: reward[i].senderCreatedAt
                         }
                         await communityRewardModel.create(community);
                     }
                 }
+                i++;
             }
         }
+        index++;
     }
 }
 
@@ -176,9 +180,13 @@ async function passiveEntry(userId, packages, packageId, price, roi, dailyReward
 }
 
 async function checkPassiveReward(userId, packageId, createdAt) {
+    const updatedTime = createdAt.toISOString().substr(11, 13)
     var passiveIncome = await passiveRewardModel.findOne({ userId: userId, packageId: packageId }).sort({ updatedAt: -1 });
     if (passiveIncome) {
-        let updatedDate = new Date((passiveIncome.updatedAt).setHours((passiveIncome.updatedAt).getHours() + 24));
+        const pTime = passiveIncome.updatedAt.toISOString().substr(0, 11)
+        let upTime = pTime.concat(updatedTime)
+        var updatedTimeDate = new Date(upTime);
+       let updatedDate = new Date((updatedTimeDate).setHours((updatedTimeDate).getHours() + 24));
         return { updatedAt: updatedDate };;
     }
     else {
@@ -189,9 +197,13 @@ async function checkPassiveReward(userId, packageId, createdAt) {
 
 async function checkCommunityReward(userId, rewardId, createdAt) {
     var communityIncome = await communityRewardModel.findOne({ userId: userId, rewardId: rewardId }).sort({ updatedAt: -1 });
+    const updatedTime = createdAt.toISOString().substr(11, 13)
     if (communityIncome) {
-        let updatedDate = new Date((communityIncome.updatedAt).setHours((communityIncome.updatedAt).getHours() + 24));
-        return { updatedAt: updatedDate };;
+        const cTime = communityIncome.updatedAt.toISOString().substr(0, 11)
+        let upTime = cTime.concat(updatedTime)
+        var updatedTimeDate = new Date(upTime);
+        let updatedDate = new Date((updatedTimeDate).setHours((updatedTimeDate).getHours() + 24));
+        return { updatedAt: updatedDate};;
     }
     else {
         let createdDateOfProduct = new Date((createdAt).setHours(createdAt.getHours() + 24));
@@ -214,7 +226,8 @@ async function updateWalletBalance(userId, passiveReward) {
     await walletModel.findOneAndUpdate({ userId: userId }, { $set: { coreWallet: coreWallet } });
 }
 
-setInterval(rewardBooster, 4000000);
+setInterval(async () => await rewardBooster(), 900000);
+
 //setInterval(rewardBooster, 12000);
 
 module.exports = {

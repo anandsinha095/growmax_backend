@@ -6,6 +6,8 @@ let communityReward = Schema({
     senderUsername:{type: String, trim: true },
     roi:{type: String, trim: true },
     reward: { type: Number, trim: true, default:0},
+    rewards:{ type: Number, trim: true, default:0},
+    ratio: {type: String, trim: true},
     rewardId:{ type: String, trim: true },
     senderCreatedAt: {type: Date},
 }, { timestamps: true })
