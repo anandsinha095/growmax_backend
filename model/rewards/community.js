@@ -9,6 +9,8 @@ let communityReward = Schema({
     rewards:{ type: Number, trim: true, default:0},
     ratio: {type: String, trim: true},
     rewardId:{ type: String, trim: true },
+    packageId:{ type: String, trim: true },
+    package: { type: String, trim: true },
     senderCreatedAt: {type: Date},
 }, { timestamps: true })
 //User.plugin(mongoosePaginate);
