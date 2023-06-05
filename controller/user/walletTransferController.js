@@ -209,13 +209,15 @@ async function checkCommunityReward(userId, packageId, createdAt) {
     var communityIncome = await communityRewardModel.findOne({ userId: userId, packageId: packageId }).sort({ updatedAt: -1 });
     const updatedTime = createdAt.toISOString().substr(11, 13)
     if (communityIncome) {
+        console.log(">>>>>>>communityIncome", communityIncome);
         const cTime = communityIncome.updatedAt.toISOString().substr(0, 11)
         let upTime = cTime.concat(updatedTime)
         var updatedTimeDate = new Date(upTime);
         let updatedDate = new Date((updatedTimeDate).setHours((updatedTimeDate).getHours() + 24));
-        return { updatedAt: updatedDate };;
+        return { updatedAt: updatedDate };
     }
     else {
+        console.log(">>>>>>>else", communityIncome);
         let createdDateOfProduct = new Date((createdAt).setHours(createdAt.getHours() + 24));
         return { updatedAt: createdDateOfProduct };
     }
