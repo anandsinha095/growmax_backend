@@ -120,9 +120,14 @@ async function rewardBooster() {
             while (i < len) {
                 //var rewardPoint = 0;
                 var timeTestCommunity = await checkCommunityReward(reward[i].userId, data[index]._id, reward[i].createdAt);
+                console.log("timeTestCommunity======>", timeTestCommunity);
+                console.log("data[index]._id======>", data[index]._id);
+                console.log("datetime======>", datetime);
                 if (timeTestCommunity.updatedAt <= datetime) {
+                    console.log(" timeTestCommunity.updatedAt <= datetime========>",  timeTestCommunity.updatedAt <= datetime);
                     var product = await productModel.findOne({ _id: data[index]._id });
                     var comReward = (reward[i].rewardPoint / activePackage.length).toFixed(12);
+                    console.log("comReward======>", comReward,  data[index].title);
                     if (parseFloat(comReward) < product.pendingReward && product.pendingReward > 0 && product.productStatus == "Active") {
                         var claimedCommunityRewards = product.claimedCommunityRewards + parseFloat(comReward); // 100 % reward distributed in package 
                         var pendingRewards = (product.pendingReward - parseFloat(comReward));// 100 % reward deducted
