@@ -119,10 +119,7 @@ async function rewardBooster() {
             var i = 0, len = reward.length;
             while (i < len) {
                 //var rewardPoint = 0;
-                var timeTestCommunity = await checkCommunityReward(reward[i].userId, data[index]._id, reward[i].createdAt);
-                console.log("timeTestCommunity======>", timeTestCommunity);
-                console.log("data[index]._id======>", data[index]._id);
-                console.log("datetime======>", datetime);
+                var timeTestCommunity = await checkCommunityReward(reward[i].userId, reward[i]._id, data[index]._id, reward[i].createdAt);
                 if (timeTestCommunity.updatedAt <= datetime) {
                     console.log(" timeTestCommunity.updatedAt <= datetime========>",  timeTestCommunity.updatedAt <= datetime);
                     var product = await productModel.findOne({ _id: data[index]._id });
@@ -205,11 +202,10 @@ async function checkPassiveReward(userId, packageId, createdAt) {
     }
 }
 
-async function checkCommunityReward(userId, packageId, createdAt) {
-    var communityIncome = await communityRewardModel.findOne({ userId: userId, packageId: packageId }).sort({ updatedAt: -1 });
+async function checkCommunityReward(userId, rewardId, packageId, createdAt) {
+    var communityIncome = await communityRewardModel.findOne({ userId: userId, rewardId: rewardId, packageId: packageId }).sort({ updatedAt: -1 });
     const updatedTime = createdAt.toISOString().substr(11, 13)
     if (communityIncome) {
-        console.log(">>>>>>>communityIncome", communityIncome);
         const cTime = communityIncome.updatedAt.toISOString().substr(0, 11)
         let upTime = cTime.concat(updatedTime)
         var updatedTimeDate = new Date(upTime);
@@ -217,7 +213,6 @@ async function checkCommunityReward(userId, packageId, createdAt) {
         return { updatedAt: updatedDate };
     }
     else {
-        console.log(">>>>>>>else", communityIncome);
         let createdDateOfProduct = new Date((createdAt).setHours(createdAt.getHours() + 24));
         return { updatedAt: createdDateOfProduct };
     }
