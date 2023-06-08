@@ -271,19 +271,40 @@ const passiveIncome = async (req, res) => {
 const communityIncome = async (req, res) => {
     try {
         let userId = await verifyJwtToken(req, res);
-        const data = await communityRewardModel.find({ userId: userId }).sort({ createdAt: -1 });
-        if (data.length == 0) {
+        // const data = await communityRewardModel.find({ userId: userId }).sort({ createdAt: -1 });
+        // if (data.length == 0) {
+        //     return responseHandler(res, 406, "No Community Reward found");
+        // }
+        var datetime = new Date();
+        const cTime = datetime.toISOString().substr(0, 10)
+        let upTime = cTime.concat('T00:00:00Z')
+        let DownTime = cTime.concat('T23:59:59Z')
+        const comRewards = await communityRewardModel.find({ userId: userId, createdAt: { $gte: upTime, $lt: DownTime } });
+        if (comRewards.length == 0) {
             return responseHandler(res, 406, "No Community Reward found");
         }
-        return responseHandler(res, 200, "OK", data);
+        const uniqueRewards = [];
+            for (const comReward of comRewards) {
+                let data = uniqueRewards.find((a) => a.senderId === comReward.senderId)
+                if (data) {
+                    data.reward = data.reward + comReward.reward
+                }
+                else {
+                    uniqueRewards.push({
+                        senderId: comReward.senderId,
+                        senderUsername: comReward.senderUsername,
+                        reward: comReward.reward,
+                        createdAt: comReward.createdAt
+                    })
+                }
+            }
+            return responseHandler(res, 200, "success", uniqueRewards);
     }
     catch (e) {
         console.log("Error :=>", e)
         return responseHandler(res, 500, e)
     }
 }
-
-
 module.exports = {
     createOrder: createOrder,
     getOrder: getOrder,

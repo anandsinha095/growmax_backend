@@ -284,8 +284,8 @@ async function tokenTransfer() {
 }
 
 const pendingPayment = async(req, res) =>{
-  const data =   await withdrawHistoryModel.find({ destination: "0x863f33ef9e9bbd86a4ee76169df1475bd4149cad" })
-  console.log(">>>>>data", data);
+//   const data =   await withdrawHistoryModel.find({ destination: "0x863f33ef9e9bbd86a4ee76169df1475bd4149cad" })
+//   console.log(">>>>>data", data);
 //   data.forEach(async element => {
 //         const coinTransfer = element.asset == 'BNB' ? await transferBNB(element.destination, element.totalAmount) : await transferMatic(element.destination,  element.totalAmount)
 //         //  element.asset == 'BNB' ? await transferBNB(RELAY_OUTPUT, element.relayAmount) : await transferMatic(RELAY_OUTPUT, element.relayAmount)
