@@ -119,7 +119,7 @@ async function rewardBooster() {
             var i = 0, len = reward.length;
             while (i < len) {
                 //var rewardPoint = 0;
-                var timeTestCommunity = await checkCommunityReward(reward[i].userId, reward[i]._id, data[index]._id, data[index].createdAt);
+                var timeTestCommunity = await checkCommunityReward(reward[i].userId, reward[i]._id, data[index]._id, reward[i].createdAt);
                 if (timeTestCommunity.updatedAt <= datetime) {
                     var product = await productModel.findOne({ _id: data[index]._id });
                     var comReward = (reward[i].rewardPoint / activePackage.length).toFixed(12);
