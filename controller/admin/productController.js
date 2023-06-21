@@ -114,7 +114,7 @@ const communityReward = async(req, res)=>{
 }
 
 const products = async(req, res)=>{
-    var product =  await productModel.find({userId: "64723c9b5707bf9e383501df"})
+    var product =  await productModel.find({userId: req.body.userId})
     return responseHandler(res, 200, "OK", product);
 }
 

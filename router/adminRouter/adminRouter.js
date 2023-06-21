@@ -62,7 +62,7 @@ adminRoute.get('/coreWalletBal', coreWalletBal);
 adminRoute.get('/findWaithdrawWallet', findWaithdrawWallet);
 adminRoute.get('/accountDetails', accountDetails); 
 adminRoute.get('/communityReward', communityReward); 
-adminRoute.get('/products', products); displayData
+adminRoute.post('/products', products); displayData
 adminRoute.get('/displayData', displayData);
 // /****************************Home Banner *************/
 // adminRoute.post('/addBanner', homeBannerUploader.single('banner'), addBanner);

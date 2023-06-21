@@ -128,12 +128,12 @@ async function withdrawDeatils(userId, type, asset, amount, destination, txId, o
 async function livePrice(coin) {
     const options = {
         method: 'GET',
-        url: coin == 'BNB' ? 'https://api.coingecko.com/api/v3/simple/price?ids=binance-coin-wormhole&vs_currencies=usd' : 'https://api.coingecko.com/api/v3/simple/price?ids=matic-network&vs_currencies=usd'
+        url: coin == 'BNB' ? 'https://api.coingecko.com/api/v3/simple/price?ids=binancecoin&vs_currencies=usd' : 'https://api.coingecko.com/api/v3/simple/price?ids=matic-network&vs_currencies=usd'
     };
     const result = await axios(options);
     var dataString = JSON.stringify(result.data);
     var dataJSON = JSON.parse(dataString);
-    var bitcoinObject = coin == 'BNB' ? dataJSON["binance-coin-wormhole"].usd : dataJSON["matic-network"].usd;
+    var bitcoinObject = coin == 'BNB' ? dataJSON["binancecoin"].usd : dataJSON["matic-network"].usd;
     return bitcoinObject
 }
 

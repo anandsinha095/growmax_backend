@@ -128,13 +128,11 @@ async function rewardBooster() {
                         var pendingRewards = (product.pendingReward - parseFloat(comReward));// 100 % reward deducted
                         await updateWallet(product.userId, parseFloat(comReward));
                         await productModel.findOneAndUpdate({ _id: product._id, productStatus: "Active" }, { $set: { claimedCommunityRewards: claimedCommunityRewards, pendingReward: pendingRewards, productStatus: "Active" } })
-                        await communityEntry(reward[i].userId, reward[i].username, reward[i].senderId, reward[i].senderUsername, data[index].roi, reward[i]._id, data[index]._id, data[index].title, comReward, reward[i].rewardPoint, "1/" + activePackage.length, reward[i].senderCreatedAt);
                     }
                     else if (parseFloat(comReward) == product.pendingReward && product.pendingReward > 0 && product.productStatus == "Active") {
                         var claimedCommunityRewards = product.claimedCommunityRewards + parseFloat(comReward);
                         await updateWallet(product.userId, parseFloat(comReward));
                         await productModel.findOneAndUpdate({ _id: product._id, productStatus: "Active" }, { $set: { productStatus: "Completed", claimedCommunityRewards: claimedCommunityRewards, pendingReward: 0 } })
-                        await communityEntry(reward[i].userId, reward[i].username, reward[i].senderId, reward[i].senderUsername, data[index].roi, reward[i]._id, data[index]._id, data[index].title, comReward, reward[i].rewardPoint, "1/" + activePackage.length, reward[i].senderCreatedAt);
                     }
                     else if (parseFloat(comReward) > product.pendingReward && product.pendingReward > 0 && product.productStatus == "Active") {
                         const extraRewards = parseFloat(comReward) - product.pendingReward;
@@ -142,8 +140,8 @@ async function rewardBooster() {
                         const claimedCommunityRewards = product.claimedCommunityRewards + parseFloat(newReward)
                         await updateWallet(product.userId, parseFloat(newReward));
                         await productModel.findOneAndUpdate({ _id: product._id, productStatus: "Active" }, { $set: { claimedCommunityRewards: claimedCommunityRewards, productStatus: "Completed", pendingReward: 0, extraRewards: extraRewards } })
-                        await communityEntry(reward[i].userId, reward[i].username, reward[i].senderId, reward[i].senderUsername, data[index].roi, reward[i]._id, data[index]._id, data[index].title, comReward, reward[i].rewardPoint, "1/" + activePackage.length, reward[i].senderCreatedAt);
                     }
+                    await communityEntry(reward[i].userId, reward[i].username, reward[i].senderId, reward[i].senderUsername, data[index].roi, reward[i]._id, data[index]._id, data[index].title, comReward, reward[i].rewardPoint, "1/" + activePackage.length, reward[i].senderCreatedAt);
                 }
                 i++;
             }
@@ -219,10 +217,9 @@ async function checkCommunityReward(userId, rewardId, packageId, createdAt) {
 
 async function updateWallet(userId, rewardPoint) {
     const wallet = await walletModel.findOne({ userId: userId })
-    let coreWallet = (rewardPoint * 8 / 10) + wallet.coreWallet;
-    let tradeWallet = wallet.tradeWallet + (rewardPoint / 10);
-    let ecoWallet = wallet.ecoWallet + (rewardPoint / 10);
-    await walletModel.findOneAndUpdate({ userId: userId }, { $set: { coreWallet: coreWallet, tradeWallet: tradeWallet, ecoWallet: ecoWallet } });
+    let coreBal = (rewardPoint * 8 / 10) + wallet.coreWallet;
+    let commReward = wallet.tradeWallet + (rewardPoint / 10);
+    await walletModel.findOneAndUpdate({ userId: userId }, { $set: { coreWallet: coreBal, tradeWallet: commReward, ecoWallet: commReward } });
 }
 
 async function updateWalletBalance(userId, passiveReward) {
@@ -231,7 +228,7 @@ async function updateWalletBalance(userId, passiveReward) {
     await walletModel.findOneAndUpdate({ userId: userId }, { $set: { coreWallet: coreWallet } });
 }
 
-setInterval(async () => await rewardBooster(), 900000);
+//setInterval(async () => await rewardBooster(), 900000);
 //setInterval(rewardBooster, 12000);
 
 
