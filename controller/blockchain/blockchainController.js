@@ -25,10 +25,12 @@ const transferFund = async (req, res) => {
         if (!check_user_exist) return responseHandler(res, 461, "User doesn't exist")
         const checkbalance = await coreWalletBalance(userId) // core wallet current balance
         console.log(">>>>>>>>checkbalance", checkbalance);
-        console.log(">>>>>>>>checkbalance < req.body.gmt", checkbalance < req.body.gmt);
+       
+
         if (checkbalance < req.body.gmt) {
             return responseHandler(res, 403, "You don't have sufficient fund for withdraw");
         }
+        console.log(">>>>>>>>checkbalance < req.body.gmt", checkbalance < req.body.gmt);
         const wallet = await withdrawModel.findOne({ userId: userId });
         if (req.body.coin == 'BNB' && (wallet.bnb == null || wallet.bnb == undefined)) {
             return responseHandler(res, 403, "Please set your withdraw BNB address before withdraw");
@@ -36,6 +38,7 @@ const transferFund = async (req, res) => {
         else if (req.body.coin == 'MATIC' && (wallet.matic == null || wallet.matic == undefined)) {
             return responseHandler(res, 403, "Please set your withdraw MATIC address before withdraw");
         }
+        console.log(">>>>>before live price");
         // Price calculation in  USD
         const bitcoinObject = await livePrice(req.body.coin)
         var fee = req.body.coin == 'BNB' ? BNB_WITHDRAW_FEE : MATIC_WITHDRAW_FEE;
