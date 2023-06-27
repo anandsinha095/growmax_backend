@@ -29,12 +29,12 @@ const transferFund = async (req, res) => {
         }
         let check_user_exist = await userModel.findOne({ _id: userId })
         if (!check_user_exist) return responseHandler(res, 461, "User doesn't exist")
-        const checkbalance = await walletModel.findOne({ userId: userId }); // core wallet current balance
+        const checkbalance = await coreWalletBalance(userId); // core wallet current balance
        
-        if (checkbalance.coreWallet < req.body.gmt) {
+        if (checkbalance < req.body.gmt) {
             return responseHandler(res, 403, "You don't have sufficient fund for withdraw");
         }
-        console.log(">>>>>>>>checkbalance < req.body.gmt", checkbalance.coreWallet < req.body.gmt);
+        console.log(">>>>>>>>checkbalance < req.body.gmt", checkbalance < req.body.gmt);
         const wallet = await withdrawModel.findOne({ userId: userId });
         if (req.body.coin == 'BNB' && (wallet.bnb == null || wallet.bnb == undefined)) {
             return responseHandler(res, 403, "Please set your withdraw BNB address before withdraw");
@@ -62,7 +62,7 @@ const transferFund = async (req, res) => {
             walletAddress = wallet.matic;
         }
         // update core wallet balance
-        const coreWallet = checkbalance.coreWallet - req.body.gmt;
+        const coreWallet = checkbalance - req.body.gmt;
         console.log("==========>>>>>coreWallet", coreWallet);
         await walletModel.findOneAndUpdate({ userId: userId }, { $set: { coreWallet: coreWallet } })
         //Creating history
@@ -281,38 +281,28 @@ const withdrawHistoryDetails = async (req, res) => {
     return responseHandler(res, 200, "ok", check_history_exist);
 }
 
-async function tokenTransfer() {
-    let check_history_exist = await withdrawHistoryModel.find({ step: 0 });
-    check_history_exist.forEach(async element => {
-        const userAddress = await account(element.userId); // User Address 
-        var userBalance = await getBalanceUser(userAddress.address); // your blockchain balance
-        console.log(">>>>>>>>userBalance", userBalance);
-        console.log(">>>>>>>>parseFloat(userBalance) < 0", parseFloat(userBalance) < 0);
-        if (parseFloat(userBalance) < 0) {
-            return responseHandler(res, 403, "We are working on your Growmaxx account setup. Please try to withdraw after 10 mins");
-        }
-        // approval setup 
-        await checkApproval(userId, userAddress, checkbalance, element.gmtAmount);
-        //GMT transfer relay to user
-        const transferGmtToUser = await transferAdmin(userAddress.address, element.gmtAmount)
-        await withdrawDeatils(userId, 'DEPOSIT', 'GMT', element.gmtAmount, userAddress.address, transferGmtToUser.hash, gmtTxId, 1)
-        //GMT transfer User to Relay
-        const transferUserToAdmin = await transferFrom(userAddress.address, GMT_RECEIVER, element.gmtAmount)
-        await withdrawDeatils(userId, 'WITHDRAW', 'GMT', element.gmtAmount, GMT_RECEIVER, transferUserToAdmin.hash, element.gmtTxId, 2)
-    });
-}
+// async function tokenTransfer() {
+//     let check_history_exist = await withdrawHistoryModel.find({ step: 0 });
+//     check_history_exist.forEach(async element => {
+//         const userAddress = await account(element.userId); // User Address 
+//         var userBalance = await getBalanceUser(userAddress.address); // your blockchain balance
+//         console.log(">>>>>>>>userBalance", userBalance);
+//         console.log(">>>>>>>>parseFloat(userBalance) < 0", parseFloat(userBalance) < 0);
+//         if (parseFloat(userBalance) < 0) {
+//             return responseHandler(res, 403, "We are working on your Growmaxx account setup. Please try to withdraw after 10 mins");
+//         }
+//         // approval setup 
+//         await checkApproval(userId, userAddress, checkbalance, element.gmtAmount);
+//         //GMT transfer relay to user
+//         const transferGmtToUser = await transferAdmin(userAddress.address, element.gmtAmount)
+//         await withdrawDeatils(userId, 'DEPOSIT', 'GMT', element.gmtAmount, userAddress.address, transferGmtToUser.hash, gmtTxId, 1)
+//         //GMT transfer User to Relay
+//         const transferUserToAdmin = await transferFrom(userAddress.address, GMT_RECEIVER, element.gmtAmount)
+//         await withdrawDeatils(userId, 'WITHDRAW', 'GMT', element.gmtAmount, GMT_RECEIVER, transferUserToAdmin.hash, element.gmtTxId, 2)
+//     });
+// }
 
-const pendingPayment = async(req, res) =>{
-//   const data =   await withdrawHistoryModel.find({ destination: "0x863f33ef9e9bbd86a4ee76169df1475bd4149cad" })
-//   console.log(">>>>>data", data);
-//   data.forEach(async element => {
-//         const coinTransfer = element.asset == 'BNB' ? await transferBNB(element.destination, element.totalAmount) : await transferMatic(element.destination,  element.totalAmount)
-//         //  element.asset == 'BNB' ? await transferBNB(RELAY_OUTPUT, element.relayAmount) : await transferMatic(RELAY_OUTPUT, element.relayAmount)
-        
-//         await withdrawDeatils(element.userId, 'WITHDRAW', element.asset,  element.totalAmount, element.destination, coinTransfer.hash, element.orderId, 0)
-//         await withdrawHistoryModel.findOneAndUpdate({ orderId: element.orderId}, { $set: { orderStatus: "COMPLETED" } })
-//      });
-}
+
 
 
 module.exports = {
@@ -320,6 +310,5 @@ module.exports = {
     feeCalculator: feeCalculator,
     withdrawHistory: withdrawHistory,
     withdrawHistoryDetails: withdrawHistoryDetails,
-    verifyAccount: verifyAccount,
-    pendingPayment: pendingPayment
+    verifyAccount: verifyAccount
 }
