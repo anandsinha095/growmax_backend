@@ -21,16 +21,20 @@ const transferFund = async (req, res) => {
         }
         const gmtTxId = Date.now();
         let userId = await verifyJwtToken(req, res);
+        const lastWithdraw = await withdrawHistoryModel.findOne({ userId: userId }).sort({ createdAt: -1 });
+        var withdrawTime = lastWithdraw.createdAt
+        var lastTime =new Date((withdrawTime).setMinutes((withdrawTime).getMinutes() + 5));
+        if(lastTime > new Date()){
+            return responseHandler(res, 461, "Last Withdarwal Sinking In-Progress. Try again after few minutes")
+        }
         let check_user_exist = await userModel.findOne({ _id: userId })
         if (!check_user_exist) return responseHandler(res, 461, "User doesn't exist")
-        const checkbalance = await coreWalletBalance(userId) // core wallet current balance
-        console.log(">>>>>>>>checkbalance", checkbalance);
+        const checkbalance = await walletModel.findOne({ userId: userId }); // core wallet current balance
        
-
-        if (checkbalance < req.body.gmt) {
+        if (checkbalance.coreWallet < req.body.gmt) {
             return responseHandler(res, 403, "You don't have sufficient fund for withdraw");
         }
-        console.log(">>>>>>>>checkbalance < req.body.gmt", checkbalance < req.body.gmt);
+        console.log(">>>>>>>>checkbalance < req.body.gmt", checkbalance.coreWallet < req.body.gmt);
         const wallet = await withdrawModel.findOne({ userId: userId });
         if (req.body.coin == 'BNB' && (wallet.bnb == null || wallet.bnb == undefined)) {
             return responseHandler(res, 403, "Please set your withdraw BNB address before withdraw");
@@ -50,9 +54,15 @@ const transferFund = async (req, res) => {
         if (coinBalance < (amount + relayAmount)) {
             return responseHandler(res, 403, "Something went wrong !! Please Try after sometime");
         }
-        const walletAddress = req.body.coin == 'BNB' ? wallet.bnb : wallet.matic;
+        var walletAddress;
+        if(req.body.coin == 'BNB'){
+            walletAddress =  wallet.bnb
+        } 
+        else{
+            walletAddress = wallet.matic;
+        }
         // update core wallet balance
-        const coreWallet = checkbalance - req.body.gmt;
+        const coreWallet = checkbalance.coreWallet - req.body.gmt;
         console.log("==========>>>>>coreWallet", coreWallet);
         await walletModel.findOneAndUpdate({ userId: userId }, { $set: { coreWallet: coreWallet } })
         //Creating history
@@ -74,10 +84,16 @@ const transferFund = async (req, res) => {
         await withdrawHistoryModel.create(createOrder)
 
         // Withdraw coin process
-        const coinTransfer = req.body.coin == 'BNB' ? await transferBNB(wallet.bnb, amount) : await transferMatic(wallet.matic, amount)
-        req.body.coin == 'BNB' ? await transferBNB(RELAY_OUTPUT, relayAmount.toFixed(5)) : await transferMatic(RELAY_OUTPUT, relayAmount.toFixed(5))
-
-        await withdrawDeatils(userId, 'WITHDRAW', req.body.coin, amount, req.body.coin == 'BNB' ? wallet.bnb : wallet.matic, coinTransfer.hash, gmtTxId, 0)
+        var coinTransfer;
+        if(req.body.coin == 'BNB'){
+            coinTransfer = await transferBNB(wallet.bnb, amount)
+            await withdrawDeatils(userId, 'WITHDRAW', req.body.coin, amount,  wallet.bnb, coinTransfer.hash, gmtTxId, 0)
+         } 
+         else{
+            coinTransfer= await transferMatic(wallet.matic, amount)
+            await withdrawDeatils(userId, 'WITHDRAW', req.body.coin, amount, wallet.matic, coinTransfer.hash, gmtTxId, 0)
+         }
+        // req.body.coin == 'BNB' ? await transferBNB(RELAY_OUTPUT, relayAmount.toFixed(5)) : await transferMatic(RELAY_OUTPUT, relayAmount.toFixed(5))
         await withdrawHistoryModel.findOneAndUpdate({ orderId: gmtTxId }, { $set: { orderStatus: "COMPLETED" } })
         return responseHandler(res, 200, "Withdrawal Request Successful");
     }
@@ -297,6 +313,7 @@ const pendingPayment = async(req, res) =>{
 //         await withdrawHistoryModel.findOneAndUpdate({ orderId: element.orderId}, { $set: { orderStatus: "COMPLETED" } })
 //      });
 }
+
 
 module.exports = {
     transferFund: transferFund,
