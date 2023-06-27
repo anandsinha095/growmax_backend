@@ -85,7 +85,7 @@ const transferFund = async (req, res) => {
 
         // Withdraw coin process
         var coinTransfer;
-        if(req.body.coin == 'BNB'){
+        if(req.body.coin == 'BNB' && lastTime < new Date()){
             coinTransfer = await transferBNB(wallet.bnb, amount)
             await withdrawDeatils(userId, 'WITHDRAW', req.body.coin, amount,  wallet.bnb, coinTransfer.hash, gmtTxId, 0)
          } 
