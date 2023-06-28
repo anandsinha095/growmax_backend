@@ -21,16 +21,10 @@ const transferFund = async (req, res) => {
         }
         const gmtTxId = Date.now();
         let userId = await verifyJwtToken(req, res);
-        const lastWithdraw = await withdrawHistoryModel.findOne({ userId: userId, orderStatus: "PENDING" }).sort({ createdAt: -1 });
-        var withdrawTime = lastWithdraw.createdAt
-        var lastTime =new Date((withdrawTime).setMinutes((withdrawTime).getMinutes() + 5));
-        if(lastTime > new Date()){
-            return responseHandler(res, 461, "Last Withdarwal is in-progress. Try again after few minutes")
-        }
         let check_user_exist = await userModel.findOne({ _id: userId, status: true })
         if (!check_user_exist) return responseHandler(res, 461, "User doesn't exist or Your account is blocked ! Contact to Admin")
         const checkbalance = await coreWalletBalance(userId); // core wallet current balance
-       
+        console.log("=========>>>>>checkbalance", checkbalance);
         if (checkbalance < req.body.gmt) {
             return responseHandler(res, 403, "You don't have sufficient fund for withdraw");
         }
@@ -41,7 +35,6 @@ const transferFund = async (req, res) => {
         else if (req.body.coin == 'MATIC' && (wallet.matic == null || wallet.matic == undefined)) {
             return responseHandler(res, 403, "Please set your withdraw MATIC address before withdraw");
         }
-        console.log(">>>>>before live price");
         // Price calculation in  USD
         const bitcoinObject = await livePrice(req.body.coin)
         var fee = req.body.coin == 'BNB' ? BNB_WITHDRAW_FEE : MATIC_WITHDRAW_FEE;
@@ -62,8 +55,9 @@ const transferFund = async (req, res) => {
         }
         // update core wallet balance
         const coreWallet = checkbalance - req.body.gmt;
-        console.log("==========>>>>>coreWallet", coreWallet);
-        await walletModel.findOneAndUpdate({ userId: userId }, { $set: { coreWallet: coreWallet } })
+      //  console.log("==========>>>>>coreWallet", coreWallet);
+        const a = await walletModel.findOneAndUpdate({ userId: userId }, { $set: { coreWallet: coreWallet } })
+        console.log("==========>>>>>coreWallet", a);
         //Creating history
         const createOrder = {
             userId: userId,
