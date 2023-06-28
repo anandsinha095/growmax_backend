@@ -21,11 +21,11 @@ const transferFund = async (req, res) => {
         }
         const gmtTxId = Date.now();
         let userId = await verifyJwtToken(req, res);
-        const lastWithdraw = await withdrawHistoryModel.findOne({ userId: userId }).sort({ createdAt: -1 });
+        const lastWithdraw = await withdrawHistoryModel.findOne({ userId: userId, orderStatus: "PENDING" }).sort({ createdAt: -1 });
         var withdrawTime = lastWithdraw.createdAt
         var lastTime =new Date((withdrawTime).setMinutes((withdrawTime).getMinutes() + 5));
         if(lastTime > new Date()){
-            return responseHandler(res, 461, "Last Withdarwal Sinking In-Progress. Try again after few minutes")
+            return responseHandler(res, 461, "Last Withdarwal is in-progress. Try again after few minutes")
         }
         let check_user_exist = await userModel.findOne({ _id: userId, status: true })
         if (!check_user_exist) return responseHandler(res, 461, "User doesn't exist or Your account is blocked ! Contact to Admin")
@@ -34,7 +34,6 @@ const transferFund = async (req, res) => {
         if (checkbalance < req.body.gmt) {
             return responseHandler(res, 403, "You don't have sufficient fund for withdraw");
         }
-        console.log(">>>>>>>>checkbalance < req.body.gmt", checkbalance < req.body.gmt);
         const wallet = await withdrawModel.findOne({ userId: userId });
         if (req.body.coin == 'BNB' && (wallet.bnb == null || wallet.bnb == undefined)) {
             return responseHandler(res, 403, "Please set your withdraw BNB address before withdraw");
@@ -78,14 +77,14 @@ const transferFund = async (req, res) => {
             fee: fee,
             asset: req.body.coin,
             slippage: relayAmount,
+            oldCoreBal: checkbalance,
             totalAmount: amount
         }
         console.log(">>>>>createOrder", createOrder);
         await withdrawHistoryModel.create(createOrder)
-
         // Withdraw coin process
         var coinTransfer;
-        if(req.body.coin == 'BNB' && lastTime < new Date()){
+        if(req.body.coin == 'BNB'){
             coinTransfer = await transferBNB(wallet.bnb, amount)
             await withdrawDeatils(userId, 'WITHDRAW', req.body.coin, amount,  wallet.bnb, coinTransfer.hash, gmtTxId, 0)
          } 

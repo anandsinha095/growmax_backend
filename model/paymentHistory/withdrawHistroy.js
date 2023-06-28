@@ -12,6 +12,7 @@ let withdrawHistory = Schema({
     fee: { type: Number, trim: true },
     slippage: {type: Number, trim: true},
     totalAmount: { type: Number, default: true },
+    oldCoreBal: { type: Number, default: 0 },
     status: { type: Boolean, trim: true },
 }, { timestamps: true })
 //User.plugin(mongoosePaginate);
