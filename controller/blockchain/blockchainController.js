@@ -22,74 +22,77 @@ const transferFund = async (req, res) => {
         const gmtTxId = Date.now();
         let userId = await verifyJwtToken(req, res);
         let check_user_exist = await userModel.findOne({ _id: userId, status: true })
-        //if (!check_user_exist) return responseHandler(res, 461, "User doesn't exist or Your account is blocked ! Contact to Admin")
-        if (check_user_exist) return responseHandler(res, 461, "withdrawal is under maintenance ! Try again after sometime")
-    //     const checkbalance = await coreWalletBalance(userId); // core wallet current balance
-    //     console.log("=========>>>>>checkbalance", checkbalance);
-    //     if (checkbalance < req.body.gmt) {
-    //         return responseHandler(res, 403, "You don't have sufficient fund for withdraw");
-    //     }
-    //     const wallet = await withdrawModel.findOne({ userId: userId });
-    //     if (req.body.coin == 'BNB' && (wallet.bnb == null || wallet.bnb == undefined)) {
-    //         return responseHandler(res, 403, "Please set your withdraw BNB address before withdraw");
-    //     }
-    //     else if (req.body.coin == 'MATIC' && (wallet.matic == null || wallet.matic == undefined)) {
-    //         return responseHandler(res, 403, "Please set your withdraw MATIC address before withdraw");
-    //     }
-    //     // Price calculation in  USD
-    //     const bitcoinObject = await livePrice(req.body.coin)
-    //     var fee = req.body.coin == 'BNB' ? BNB_WITHDRAW_FEE : MATIC_WITHDRAW_FEE;
-    //     const amount = (((req.body.gmt - (req.body.gmt * 1 / 100)) / bitcoinObject).toFixed(4)) - fee // Amount calculator 
-    //     const relayAmount = (req.body.gmt * 1 / 100) / bitcoinObject;
-    //     // checking balance bnb
-    //     var coinBalance = await getBalance(req.body.coin);
-    //     console.log("=========>>>>>coinBalance", coinBalance);
-    //     if (coinBalance < (amount + relayAmount)) {
-    //         return responseHandler(res, 403, "Something went wrong !! Please Try after sometime");
-    //     }
-    //     var walletAddress;
-    //     if(req.body.coin == 'BNB'){
-    //         walletAddress =  wallet.bnb
-    //     } 
-    //     else{
-    //         walletAddress = wallet.matic;
-    //     }
-    //     // update core wallet balance
-    //     const coreWallet = checkbalance - req.body.gmt;
-    //   //  console.log("==========>>>>>coreWallet", coreWallet);
-    //     const a = await walletModel.findOneAndUpdate({ userId: userId }, { $set: { coreWallet: coreWallet } })
-    //     console.log("==========>>>>>coreWallet", a);
-    //     //Creating history
-    //     const createOrder = {
-    //         userId: userId,
-    //         type: "WITHDRAW",
-    //         destination: walletAddress,
-    //         gmtAmount: req.body.gmt,
-    //         orderId: gmtTxId,
-    //         status: true,
-    //         pair: "GMT - " + req.body.coin,
-    //         orderStatus: "PENDING",
-    //         fee: fee,
-    //         asset: req.body.coin,
-    //         slippage: relayAmount,
-    //         oldCoreBal: checkbalance,
-    //         totalAmount: amount
-    //     }
-    //     console.log(">>>>>createOrder", createOrder);
-    //     await withdrawHistoryModel.create(createOrder)
-    //     // Withdraw coin process
-    //     var coinTransfer;
-    //     if(req.body.coin == 'BNB'){
-    //         coinTransfer = await transferBNB(wallet.bnb, amount)
-    //         await withdrawDeatils(userId, 'WITHDRAW', req.body.coin, amount,  wallet.bnb, coinTransfer.hash, gmtTxId, 0)
-    //      } 
-    //      else{
-    //         coinTransfer= await transferMatic(wallet.matic, amount)
-    //         await withdrawDeatils(userId, 'WITHDRAW', req.body.coin, amount, wallet.matic, coinTransfer.hash, gmtTxId, 0)
-    //      }
-    //     // req.body.coin == 'BNB' ? await transferBNB(RELAY_OUTPUT, relayAmount.toFixed(5)) : await transferMatic(RELAY_OUTPUT, relayAmount.toFixed(5))
-    //     await withdrawHistoryModel.findOneAndUpdate({ orderId: gmtTxId }, { $set: { orderStatus: "COMPLETED" } })
-        return responseHandler(res, 200, "Withdrawal Request Successful");
+        if (!check_user_exist) return responseHandler(res, 461, "User doesn't exist or Your account is blocked ! Contact to Admin")
+        const checkbalance = await coreWalletBalance(userId); // core wallet current balance
+        console.log("=========>>>>>checkbalance", checkbalance);
+        if (checkbalance < req.body.gmt) {
+            return responseHandler(res, 403, "You don't have sufficient fund for withdraw");
+        }
+        const wallet = await withdrawModel.findOne({ userId: userId });
+        if (req.body.coin == 'BNB' && (wallet.bnb == null || wallet.bnb == undefined)) {
+            return responseHandler(res, 403, "Please set your withdraw BNB address before withdraw");
+        }
+        else if (req.body.coin == 'MATIC' && (wallet.matic == null || wallet.matic == undefined)) {
+            return responseHandler(res, 403, "Please set your withdraw MATIC address before withdraw");
+        }
+        // Price calculation in  USD
+        const bitcoinObject = await livePrice(req.body.coin)
+        var fee = req.body.coin == 'BNB' ? BNB_WITHDRAW_FEE : MATIC_WITHDRAW_FEE;
+        const amount = (((req.body.gmt - (req.body.gmt * 1 / 100)) / bitcoinObject).toFixed(4)) - fee // Amount calculator 
+        const relayAmount = (req.body.gmt * 1 / 100) / bitcoinObject;
+        // checking balance bnb
+        var coinBalance = await getBalance(req.body.coin);
+        console.log("=========>>>>>coinBalance", coinBalance);
+        if (coinBalance < (amount + relayAmount)) {
+            return responseHandler(res, 403, "Something went wrong !! Please Try after sometime");
+        }
+        var walletAddress;
+        if (req.body.coin == 'BNB') {
+            walletAddress = wallet.bnb
+        }
+        else {
+            walletAddress = wallet.matic;
+        }
+        // update core wallet balance
+        const coreWallet = checkbalance - req.body.gmt;
+        const updateWallet = await walletModel.findOneAndUpdate({ userId: userId }, { $set: { coreWallet: coreWallet } })
+        //Creating history
+        const createOrder = {
+            userId: userId,
+            type: "WITHDRAW",
+            destination: walletAddress,
+            gmtAmount: req.body.gmt,
+            orderId: gmtTxId,
+            status: true,
+            pair: "GMT - " + req.body.coin,
+            orderStatus: "PENDING",
+            fee: fee,
+            asset: req.body.coin,
+            slippage: relayAmount,
+            oldCoreBal: checkbalance,
+            totalAmount: amount
+        }
+        await withdrawHistoryModel.create(createOrder)
+        const withdrwTime = await withdrawHistoryModel.findOne({ orderId: gmtTxId })
+        if (withdrwTime.oldCoreBal == updateWallet.coreWallet) {
+            // Withdraw coin process
+            var coinTransfer
+            if (req.body.coin == 'BNB') {
+                coinTransfer = await transferBNB(wallet.bnb, amount)
+                await withdrawDeatils(userId, 'WITHDRAW', req.body.coin, amount, wallet.bnb, coinTransfer.hash, gmtTxId, 0)
+            }
+            else {
+                coinTransfer = await transferMatic(wallet.matic, amount)
+                await withdrawDeatils(userId, 'WITHDRAW', req.body.coin, amount, wallet.matic, coinTransfer.hash, gmtTxId, 0)
+            }
+            // req.body.coin == 'BNB' ? await transferBNB(RELAY_OUTPUT, relayAmount.toFixed(5)) : await transferMatic(RELAY_OUTPUT, relayAmount.toFixed(5))
+            await withdrawHistoryModel.findOneAndUpdate({ orderId: gmtTxId }, { $set: { orderStatus: "COMPLETED" } })
+            return responseHandler(res, 200, "Withdrawal Request Successful");
+        }
+        else {
+            await withdrawHistoryModel.deleteOne({ orderId: gmtTxId })
+            return responseHandler(res, 200, "Withdrawal Request Successfully");
+        }
     }
     catch (e) {
         console.log("Error :=>", e)
