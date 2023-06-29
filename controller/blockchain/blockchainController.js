@@ -23,7 +23,7 @@ const transferFund = async (req, res) => {
         let userId = await verifyJwtToken(req, res);
         let check_user_exist = await userModel.findOne({ _id: userId, status: true })
         //if (!check_user_exist) return responseHandler(res, 461, "User doesn't exist or Your account is blocked ! Contact to Admin")
-        if (check_user_exist) return responseHandler(res, 461, "Withdrwaal is under maintenance ! Try again after sometime")
+        if (check_user_exist) return responseHandler(res, 461, "withdrawal is under maintenance ! Try again after sometime")
     //     const checkbalance = await coreWalletBalance(userId); // core wallet current balance
     //     console.log("=========>>>>>checkbalance", checkbalance);
     //     if (checkbalance < req.body.gmt) {
