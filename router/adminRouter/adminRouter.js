@@ -1,31 +1,19 @@
 const adminRoute = require('express').Router();
-import { signUp, getAllEmployee, updateCustomer, employeeDetail, updateEmployee, userIsActive, employeeIsActive, deleteEmployee, dashboard } from '../../controller/admin/adminController';
+import { signUp, signIn, getAllusers, adminInfo, adminDisplayData, updateCustomer, employeeDetail, updateEmployee, userIsActive, employeeIsActive, deleteEmployee, dashboard } from '../../controller/admin/adminController';
 import { addPackage, addLevel, roleList, roleDetail, updateRole, updatePackage } from '../../controller/admin/packageController';
 import {getWalletBalance, usersWallet, findWallet, coreWalletBal, findWaithdrawWallet, accountDetails, communityReward, products, displayData} from '../../controller/admin/productController';
 import { verifyJwt, checkSession } from '../../common/function';
-var multer = require('multer')
-// to upload single file  
-var uploader = multer({
-    dest: 'public/images/profile/'
-});
-var productImageUploader = multer({
-    dest: 'public/images/product/'
-});
-var categoryImageUploader = multer({
-    dest: 'public/images/category/'
-});
-var homeBannerUploader = multer({
-    dest: 'public/images/banner/'
-});
 
 /************************* New Admin users  **************************/
-adminRoute.post('/singup', signUp);
+adminRoute.post('/signup', signUp);
+adminRoute.post('/signin', signIn);
 
 /*********************************** Create New order *************************************************************************/
 
 adminRoute.put('/userIsActive', verifyJwt, userIsActive);
-
-
+adminRoute.get('/users', verifyJwt, getAllusers); 
+adminRoute.get('/adminDisplayData', verifyJwt, adminDisplayData);
+adminRoute.get('/adminInfo', verifyJwt, adminInfo);
 /************************Employee/ User ********************/
 
 

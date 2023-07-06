@@ -228,7 +228,7 @@ async function updateWalletBalance(userId, passiveReward) {
     await walletModel.findOneAndUpdate({ userId: userId }, { $set: { coreWallet: coreWallet } });
 }
 
-setInterval(async () => await rewardBooster(), 900000);
+//setInterval(async () => await rewardBooster(), 900000);
 //setInterval(rewardBooster, 12000);
 
 
