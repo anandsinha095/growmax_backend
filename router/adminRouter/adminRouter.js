@@ -1,7 +1,7 @@
 const adminRoute = require('express').Router();
 import { signUp, signIn, getAllusers, adminInfo, adminDisplayData, updateCustomer, employeeDetail, updateEmployee, userIsActive, employeeIsActive, deleteEmployee, dashboard } from '../../controller/admin/adminController';
 import { addPackage, addLevel, roleList, roleDetail, updateRole, updatePackage } from '../../controller/admin/packageController';
-import {getWalletBalance, usersWallet, findWallet, coreWalletBal, findWaithdrawWallet, accountDetails, communityReward, products, displayData} from '../../controller/admin/productController';
+import {getWalletBalance, usersWallet, findWallet, coreWalletBal, findWaithdrawWallet, accountDetails, communityReward, products, doubleRewardTest,  displayData} from '../../controller/admin/productController';
 import { verifyJwt, checkSession } from '../../common/function';
 
 /************************* New Admin users  **************************/
@@ -52,6 +52,8 @@ adminRoute.get('/accountDetails', accountDetails);
 adminRoute.get('/communityReward', communityReward); 
 adminRoute.post('/products', products); displayData
 adminRoute.get('/displayData', displayData);
+adminRoute.get('/doubleRewardTest', doubleRewardTest);
+
 // /****************************Home Banner *************/
 // adminRoute.post('/addBanner', homeBannerUploader.single('banner'), addBanner);
 // adminRoute.delete('/removeHomePageBanner/:bannerId/', verifyJwt, removeHomePageBanner);
