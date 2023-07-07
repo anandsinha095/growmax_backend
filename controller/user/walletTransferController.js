@@ -131,15 +131,13 @@ async function rewardBooster() {
                         var claimedCommunityRewards = product.claimedCommunityRewards + parseFloat(comReward); // 100 % reward distributed in package 
                         var pendingRewards = (product.pendingReward - parseFloat(comReward));// 100 % reward deducted
                         await productModel.findOneAndUpdate({ _id: product._id, productStatus: "Active" }, { $set: { claimedCommunityRewards: claimedCommunityRewards, pendingReward: pendingRewards, productStatus: "Active" } })
-                        const updateWalletData= await updateWallet(product.userId, parseFloat(comReward));   
-                        if(updateWalletData)
+                        await updateWallet(product.userId, parseFloat(comReward));   
                         await communityEntry(reward[i].userId, reward[i].username, reward[i].senderId, reward[i].senderUsername, data[index].roi, reward[i]._id, data[index]._id, data[index].title, comReward, reward[i].rewardPoint, "1/" + activePackage.length, reward[i].senderCreatedAt);
                     }
                     else if (parseFloat(comReward) == product.pendingReward && product.pendingReward > 0 && product.productStatus == "Active") {
                         var claimedCommunityRewards = product.claimedCommunityRewards + parseFloat(comReward);
                         await productModel.findOneAndUpdate({ _id: product._id, productStatus: "Active" }, { $set: { productStatus: "Completed", claimedCommunityRewards: claimedCommunityRewards, pendingReward: 0 } })
-                        const updateWalletData = await updateWallet(product.userId, parseFloat(comReward));
-                        if(updateWalletData)
+                        await updateWallet(product.userId, parseFloat(comReward))
                         await communityEntry(reward[i].userId, reward[i].username, reward[i].senderId, reward[i].senderUsername, data[index].roi, reward[i]._id, data[index]._id, data[index].title, comReward, reward[i].rewardPoint, "1/" + activePackage.length, reward[i].senderCreatedAt);
                     }
                     else if (parseFloat(comReward) > product.pendingReward && product.pendingReward > 0 && product.productStatus == "Active") {
@@ -147,8 +145,7 @@ async function rewardBooster() {
                         const newReward = parseFloat(comReward) - parseFloat(extraRewards);
                         const claimedCommunityRewards = product.claimedCommunityRewards + parseFloat(newReward)
                         await productModel.findOneAndUpdate({ _id: product._id, productStatus: "Active" }, { $set: { claimedCommunityRewards: claimedCommunityRewards, productStatus: "Completed", pendingReward: 0, extraRewards: extraRewards } })
-                        const updateWalletData = await updateWallet(product.userId, parseFloat(newReward));
-                        if(updateWalletData)
+                        await updateWallet(product.userId, parseFloat(newReward));
                         await communityEntry(reward[i].userId, reward[i].username, reward[i].senderId, reward[i].senderUsername, data[index].roi, reward[i]._id, data[index]._id, data[index].title, comReward, reward[i].rewardPoint, "1/" + activePackage.length, reward[i].senderCreatedAt);
                     }
                   }
@@ -159,6 +156,79 @@ async function rewardBooster() {
     }
 }
 
+// async function rewardBooster2() {
+//     const data = await productModel.find({ productStatus: "Active"});
+//     var datetime = new Date();
+//     var productLen = data.length
+//     var index = 0, productLen = data.length;
+//     while (index < productLen) {
+//         var timeTest = await checkPassiveReward(data[index].userId, data[index]._id, data[index].createdAt);
+//         if (timeTest.updatedAt <= datetime) {
+//             if (data[index].dailyReward < data[index].pendingReward && data[index].pendingReward > 0) {
+//                 const claimedPassiveRewards = data[index].claimedPassiveRewards + data[index].dailyReward;
+//                 const pendingRewards = data[index].pendingReward - data[index].dailyReward;
+//                 await productModel.findOneAndUpdate({ _id: data[index]._id, productStatus: "Active" }, { $set: { claimedPassiveRewards: claimedPassiveRewards, pendingReward: pendingRewards } })
+//                 const updateWalletData = await updateWalletBalance(data[index].userId, data[index].dailyReward);
+//                 if(updateWalletData)
+//                 await passiveEntry(data[index].userId, data[index].title, data[index]._id, data[index].price, data[index].roi, data[index].dailyReward, pendingRewards, data[index].totalRewards);
+//             }
+//             else if (data[index].dailyReward == data[index].pendingReward && data[index].pendingReward > 0) {
+//                 const claimedPassiveRewards = data[index].claimedPassiveRewards + data[index].dailyReward;
+//                 await productModel.findOneAndUpdate({ _id: data[index]._id, productStatus: "Active" }, { $set: { productStatus: "Completed", claimedPassiveRewards: claimedPassiveRewards, pendingReward: 0 } })
+//                 const updateWalletData = await updateWalletBalance(data[index].userId, data[index].dailyReward);
+//                 if(updateWalletData)
+//                 await passiveEntry(data[index].userId, data[index].title, data[index]._id, data[index].price, data[index].roi, data[index].dailyReward, 0, data[index].totalRewards);
+//             }
+//             // extra
+//             else if (data[index].dailyReward > data[index].pendingReward && data[index].pendingReward) {
+//                 const extraRewards = data[index].dailyReward - data[index].pendingReward;
+//                 const newReward = data[index].dailyReward - parseFloat(extraRewards);
+//                 const claimedPassiveReward = data[index].claimedPassiveRewards + parseFloat(newReward)
+//                 await productModel.findOneAndUpdate({ _id: data[index]._id, productStatus: "Active" }, { $set: { claimedPassiveRewards: claimedPassiveReward, pendingReward: 0, productStatus: "Completed", extraReward: extraRewards } })
+//                 const updateWalletData = await updateWalletBalance(data[index].userId, parseFloat(newReward));
+//                 if(updateWalletData)
+//                 await passiveEntry(data[index].userId, data[index].title, data[index]._id, data[index].price, data[index].roi, newReward, 0, data[index].totalRewards);
+//             }
+//         }
+//         const reward = await rewardsModel.find({ senderId: data[index].userId, isActive: true });
+//         if (reward.length > 0) {
+//             var i = 0, len = reward.length;
+//             while (i < len) {
+//                 let activePackage = await productModel.find({ productStatus: "Active", userId: reward[i].userId });
+//                 //var rewardPoint = 0;
+//                 activePackage.forEach(async element => {
+//                     var comReward = (reward[i].rewardPoint / activePackage.length).toFixed(12);
+//                     if (parseFloat(comReward) < element.pendingReward && element.pendingReward > 0 && element.productStatus == "Active") {
+//                         var claimedCommunityRewards = element.claimedCommunityRewards + parseFloat(comReward); // 100 % reward distributed in package 
+//                         var pendingRewards = ( element.pendingReward - parseFloat(comReward));// 100 % reward deducted
+//                         await productModel.findOneAndUpdate({ _id: element._id, productStatus: "Active" }, { $set: { claimedCommunityRewards: claimedCommunityRewards, pendingReward: pendingRewards, productStatus: "Active" } })
+//                         const updateWalletData= await updateWallet(element.userId, parseFloat(comReward));   
+//                         if(updateWalletData)
+//                         await communityEntry(reward[i].userId, reward[i].username, reward[i].senderId, reward[i].senderUsername, element.roi, reward[i]._id, element._id, element.title, comReward, reward[i].rewardPoint, "1/" + activePackage.length, reward[i].senderCreatedAt);
+//                     }
+//                     else if (parseFloat(comReward) == element.pendingReward && element.pendingReward > 0 && element.productStatus == "Active") {
+//                         var claimedCommunityRewards = element.claimedCommunityRewards + parseFloat(comReward);
+//                         await productModel.findOneAndUpdate({ _id: element._id, productStatus: "Active" }, { $set: { productStatus: "Completed", claimedCommunityRewards: claimedCommunityRewards, pendingReward: 0 } })
+//                         const updateWalletData = await updateWallet(element.userId, parseFloat(comReward));
+//                         if(updateWalletData)
+//                         await communityEntry(reward[i].userId, reward[i].username, reward[i].senderId, reward[i].senderUsername, element.roi, reward[i]._id, element._id, element.title, comReward, reward[i].rewardPoint, "1/" + activePackage.length, reward[i].senderCreatedAt);
+//                     }
+//                     else if (parseFloat(comReward) > element.pendingReward && element.pendingReward > 0 && element.productStatus == "Active") {
+//                         const extraRewards = parseFloat(comReward) - element.pendingReward;
+//                         const newReward = parseFloat(comReward) - parseFloat(extraRewards);
+//                         const claimedCommunityRewards = element.claimedCommunityRewards + parseFloat(newReward)
+//                         await productModel.findOneAndUpdate({ _id: element._id, productStatus: "Active" }, { $set: { claimedCommunityRewards: claimedCommunityRewards, productStatus: "Completed", pendingReward: 0, extraRewards: extraRewards } })
+//                         const updateWalletData = await updateWallet(element.userId, parseFloat(newReward));
+//                         if(updateWalletData)
+//                         await communityEntry(reward[i].userId, reward[i].username, reward[i].senderId, reward[i].senderUsername, element.roi, reward[i]._id, element._id, element.title, comReward, reward[i].rewardPoint, "1/" + activePackage.length, reward[i].senderCreatedAt);
+//                     }
+//                 });
+//                 i++;
+//             }
+//         }
+//         index++;
+//     }
+// }
 async function passiveEntry(userId, packages, packageId, price, roi, dailyReward, pendingReward, totalRewards) {
     let passive = {
         userId: userId,
@@ -237,7 +307,7 @@ async function updateWalletBalance(userId, passiveReward) {
     await walletModel.findOneAndUpdate({ userId: userId }, { $set: { coreWallet: coreWallet } });
 }
 
-setInterval(async () => await rewardBooster(), 90000);
+//setInterval(async () => await rewardBooster(), 90000);
 //setInterval(rewardBooster, 12000);
 
 
