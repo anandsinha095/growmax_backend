@@ -6,10 +6,10 @@ var fs = require('fs');
   /****************************  fetching package  ************************/
 const packages = async (req, res) => {
     try{
-        const silver =  await packagesModel.find({ name: "Basic"});
-        const gold =  await packagesModel.find({ name: "Medium"})
-        const daimond =  await packagesModel.find({ name: "Advance"});
-        const platinum =  await packagesModel.find({ name: "Corporate"})
+        const silver =  await packagesModel.find({ name: "Basic"}).sort({price:1});
+        const gold =  await packagesModel.find({ name: "Medium"}).sort({price:1})
+        const daimond =  await packagesModel.find({ name: "Advance"}).sort({price:1});
+        const platinum =  await packagesModel.find({ name: "Corporate"}).sort({price:1})
         return responseHandler(res, 200, "Packages Successfully fetched", {silver: silver, gold:gold, daimond:daimond, platinum:platinum})             
     }    
     catch (e) { return responseHandler(res, 500, "Internal Server Error.", e) }  
@@ -17,10 +17,10 @@ const packages = async (req, res) => {
 
   const reBuy = async (req, res) => {
     try{
-        const silver =  await packagesModel.find({ name: "Basic"});
-        const gold =  await packagesModel.find({ name: "Medium"})
-        const daimond =  await packagesModel.find({ name: "Advance"})
-        const platinum =  await packagesModel.find({ name: "Corporate"})
+        const silver =  await packagesModel.find({ name: "Basic"}).sort({price:1});
+        const gold =  await packagesModel.find({ name: "Medium"}).sort({price:1})
+        const daimond =  await packagesModel.find({ name: "Advance"}).sort({price:1})
+        const platinum =  await packagesModel.find({ name: "Corporate"}).sort({price:1})
         const mini_pack =  await packagesModel.find({ name: "MINI PACK"})
         return responseHandler(res, 200, "Packages Successfully fetched", {silver: silver, gold:gold, daimond:daimond, platinum:platinum, mini_pack:mini_pack})             
     }    

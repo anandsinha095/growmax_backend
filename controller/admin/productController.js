@@ -160,35 +160,35 @@ const displayData = async (req, res) => {
 
 
 const doubleRewardTest = async (req, res) => {
-    const cTime = "2023-07-06"
+    const cTime = "2023-07-07"
     console.log("cTime", cTime);
     let upTime = cTime.concat('T00:00:00Z')
     let DownTime = cTime.concat('T23:59:59Z')
-    let user = await userModel.find({ status: true, _id:"645e3c9cc98eea01578e2af6"});
-   // user.forEach(async element => {
-        // var passiveIncome = await passiveRewardModel.find({ userId: element._id, createdAt: { $gte: upTime, $lt: DownTime } })
-        // console.log(" passiveIncome[index].packageId", passiveIncome);
-        // for (let index = 0; index < passiveIncome.length; index++) {
-        //     console.log(">>>>>>>>>>user", element._id);
+    let user = await userModel.find({ status: true});
+   user.forEach(async element => {
+        var passiveIncome = await passiveRewardModel.find({ userId: element._id, createdAt: { $gte: upTime, $lt: DownTime } })
+        console.log(">>>>>>passiveIncome", passiveIncome);
+        for (let index = 0; index < passiveIncome.length; index++) {
+            console.log(">>>>>>>>>>user>>>>>", element._id);
             
-        //     if (index > 0 && passiveIncome[0].packageId == passiveIncome[index].packageId && passiveIncome[0].pendingReward == passiveIncome[index].pendingReward) {
-               
-        //         await passiveRewardModel.deleteOne({ _id: passiveIncome[index]._id });
-        //     }
-        // }
-    //})
-    let product = await productModel.find({ status: true, _id:"645f51aec98eea01578e2c06"});
-    console.log(">>>>>product", product);
-    product.forEach(async element => {
-        const comRewards = await communityRewardModel.find({ packageId: element._id, createdAt: { $gte: upTime, $lt: DownTime } });
-     console.log(" passiveIncome[index].packageId", comRewards);
-        for (let index = 0; index < comRewards.length; index++) {
-            if (index > 0 && comRewards[0].senderId == comRewards[index].senderId) {
-                console.log(">>>>>>>>>>user", comRewards[index]);
-              //  await passiveRewardModel.deleteOne({ _id: comRewards[index]._id });
+            if (index > 0 && passiveIncome[0].packageId == passiveIncome[index].packageId && passiveIncome[0].pendingReward == passiveIncome[index].pendingReward) {
+                console.log(">>>>>>>>>>passiveIncome test",passiveIncome[index]._id);
+              //  await passiveRewardModel.deleteOne({ _id: passiveIncome[index]._id });
             }
         }
-    });
+    })
+    // let product = await productModel.find({ status: true, _id:"645f51aec98eea01578e2c06"});
+    // console.log(">>>>>product", product);
+    // product.forEach(async element => {
+    //     const comRewards = await communityRewardModel.find({ packageId: element._id, createdAt: { $gte: upTime, $lt: DownTime } });
+    //  console.log(" passiveIncome[index].packageId", comRewards);
+    //     for (let index = 0; index < comRewards.length; index++) {
+    //         if (index > 0 && comRewards[0].senderId == comRewards[index].senderId) {
+    //             console.log(">>>>>>>>>>user", comRewards[index]);
+    //           //  await passiveRewardModel.deleteOne({ _id: comRewards[index]._id });
+    //         }
+    //     }
+    // });
 
     return responseHandler(res, 200, "Success")
 
